@@ -25,10 +25,10 @@ namespace TickBased.Scripts.Commands
             // Animation or effect for attacking
             // e.g. Rotate the attacker towards the target
             Vector2 direction = _targetCreatureEntity.CreatureTransform.position - _currentCreatureEntity.CreatureTransform.position;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90;
             _currentCreatureEntity.SetDirection(Quaternion.AngleAxis(angle, Vector3.forward));
 
-            yield return new WaitForSeconds(0.2f); // Delay for some effect or animation
+            // yield return new WaitForSeconds(0.2f); // Delay for some effect or animation
 
             // Apply damage logic
             // e.g. targetEntity.TakeDamage(damage);

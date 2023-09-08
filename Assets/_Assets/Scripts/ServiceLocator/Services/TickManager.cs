@@ -13,6 +13,9 @@ namespace FearProj.ServiceLocator
         private List<ICommand> commandQueue = new List<ICommand>();
         private int currentTick = 0;
         private WaitForSeconds _commandDelay = new WaitForSeconds(0.25f);
+
+        private bool _isExecutingCommands = false;
+        
         public void QueueCommand(ICommand command)
         {
             Logger.Log($"Added command {command.GetType()}", "TickManager");
@@ -21,6 +24,8 @@ namespace FearProj.ServiceLocator
         
         public void ManualTick()
         {
+            if (_isExecutingCommands)
+                return;
             OnTick?.Invoke();
             ExecuteCommands();
         }
@@ -36,6 +41,7 @@ namespace FearProj.ServiceLocator
 
         private IEnumerator ExecuteCommandsCoroutine()
         {
+            _isExecutingCommands = true;
             foreach (var command in commandQueue)
             {
                 yield return StartCoroutine(command.Execute());
@@ -43,6 +49,7 @@ namespace FearProj.ServiceLocator
             }
 
             commandQueue.Clear();
+            _isExecutingCommands = false;
         }
     }
 }
