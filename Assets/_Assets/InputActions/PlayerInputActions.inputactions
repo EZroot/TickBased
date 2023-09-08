@@ -1,0 +1,46 @@
+{
+    "name": "PlayerInputActions",
+    "maps": [
+        {
+            "name": "Movement",
+            "id": "bf5e1ca7-3753-4434-a5e0-1ca599136d74",
+            "actions": [
+                {
+                    "name": "UpHold",
+                    "type": "Button",
+                    "id": "ca023ca7-4b89-4efc-9265-1e261e9d9e6e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "68a74dd5-5230-4305-8981-32f347289c48",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PC Control Scheme",
+                    "action": "UpHold",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "PC Control Scheme",
+            "bindingGroup": "PC Control Scheme",
+            "devices": [
+                {
+                    "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}

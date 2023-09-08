@@ -1,0 +1,2 @@
+namespace FearProj.ServiceLocator
+{}

@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ba2a0ffbf3359146b6f8b77f3bd34b5, type: 3}
+  m_Name: SceneSettings
+  m_EditorClassIdentifier: 
+  _bootstrapSceneName: 01_Bootstrap_Scene
+  _lobbySceneName: 02_Menui_Scene
+  _gameSceneName: 03_GameScene

@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 468a46d0ae32c3544b7d98094e6448a9, type: 3}
+  m_Name: AddressableAssetSettings
+  m_EditorClassIdentifier: 
+  m_DefaultGroup: bcacf555161c0ad44abb2691039902ed
+  m_currentHash:
+    serializedVersion: 2
+    Hash: 8c31156cc90c92f4480bd21899ab15f0
+  m_OptimizeCatalogSize: 0
+  m_BuildRemoteCatalog: 0
+  m_BundleLocalCatalog: 0
+  m_CatalogRequestsTimeout: 0
+  m_DisableCatalogUpdateOnStart: 0
+  m_IgnoreUnsupportedFilesInBuild: 0
+  m_UniqueBundleIds: 0
+  m_NonRecursiveBuilding: 1
+  m_CCDEnabled: 0
+  m_maxConcurrentWebRequests: 3
+  m_ContiguousBundles: 1
+  m_StripUnityVersionFromBundleBuild: 0
+  m_DisableVisibleSubAssetRepresentations: 0
+  m_ShaderBundleNaming: 0
+  m_ShaderBundleCustomNaming: 
+  m_MonoScriptBundleNaming: 0
+  m_CheckForContentUpdateRestrictionsOption: 0
+  m_MonoScriptBundleCustomNaming: 
+  m_RemoteCatalogBuildPath:
+    m_Id: 
+  m_RemoteCatalogLoadPath:
+    m_Id: 
+  m_ContentStateBuildPathProfileVariableName: 
+  m_CustomContentStateBuildPath: 
+  m_ContentStateBuildPath: 
+  m_BuildAddressablesWithPlayerBuild: 0
+  m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
+  m_GroupAssets:
+  - {fileID: 11400000, guid: c5f83c637e7436943881e87fb528eddd, type: 2}
+  - {fileID: 11400000, guid: 286dc6d254c7c7243ac352e74ff06ed0, type: 2}
+  - {fileID: 11400000, guid: ce29c80e7ebb82448831f52d9f86b7b9, type: 2}
+  m_BuildSettings:
+    m_CompileScriptsInVirtualMode: 0
+    m_CleanupStreamingAssetsAfterBuilds: 1
+    m_LogResourceManagerExceptions: 1
+    m_BundleBuildPath: Temp/com.unity.addressables/AssetBundles
+  m_ProfileSettings:
+    m_Profiles:
+    - m_InheritedParent: 
+      m_Id: 45c50f85cf39f8149a15d7645afc03b1
+      m_ProfileName: Default
+      m_Values:
+      - m_Id: 94667bc4010dd894ea7623a201836c06
+        m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
+      - m_Id: 760d72459e0588a4382ee7164b751764
+        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
+      - m_Id: 2851d8bb1293df447a748050486083a9
+        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
+      - m_Id: 279d7ace7345c344b998f255b4343b01
+        m_Value: ServerData/[BuildTarget]
+      - m_Id: 63b94e85e309b864893a81ce2b2269f2
+        m_Value: http://[PrivateIpAddress]:[HostingServicePort]
+    m_ProfileEntryNames:
+    - m_Id: 94667bc4010dd894ea7623a201836c06
+      m_Name: BuildTarget
+      m_InlineUsage: 0
+    - m_Id: 760d72459e0588a4382ee7164b751764
+      m_Name: Local.BuildPath
+      m_InlineUsage: 0
+    - m_Id: 2851d8bb1293df447a748050486083a9
+      m_Name: Local.LoadPath
+      m_InlineUsage: 0
+    - m_Id: 279d7ace7345c344b998f255b4343b01
+      m_Name: Remote.BuildPath
+      m_InlineUsage: 0
+    - m_Id: 63b94e85e309b864893a81ce2b2269f2
+      m_Name: Remote.LoadPath
+      m_InlineUsage: 0
+    m_ProfileVersion: 1
+  m_LabelTable:
+    m_LabelNames:
+    - default
+    - entitydataso
+  m_SchemaTemplates: []
+  m_GroupTemplateObjects:
+  - {fileID: 11400000, guid: daa97834ce0a25e4faf9fa3d8f32b91f, type: 2}
+  m_InitializationObjects: []
+  m_CertificateHandlerType:
+    m_AssemblyName: 
+    m_ClassName: 
+  m_ActivePlayerDataBuilderIndex: 3
+  m_DataBuilders:
+  - {fileID: 11400000, guid: 78058f03352aa55429f86c13a6f1c928, type: 2}
+  - {fileID: 11400000, guid: 60bab648519e42a47b02dfe2085bb6d0, type: 2}
+  - {fileID: 11400000, guid: 51387a5b29c8eaa479cc95ee2af2c7ee, type: 2}
+  - {fileID: 11400000, guid: 5826753f171d61341842456d8a6670f0, type: 2}
+  m_ActiveProfileId: 45c50f85cf39f8149a15d7645afc03b1
+  m_HostingServicesManager:
+    m_HostingServiceInfos: []
+    m_Settings: {fileID: 11400000}
+    m_NextInstanceId: 0
+    m_RegisteredServiceTypeRefs: []
+    m_PingTimeoutInMilliseconds: 5000
