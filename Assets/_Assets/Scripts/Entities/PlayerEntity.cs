@@ -25,10 +25,16 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
     {
         if (base.IsOwner)
         {
-            if(Input.GetKey(KeyCode.D))
-                SetMovement(Vector2.right, 2f);
-
-            if (Input.GetKeyDown(KeyCode.A))
+            if(Input.GetKeyDown(KeyCode.D))
+                RPCSendCommandMoveServer(Vector2.right);
+            else if(Input.GetKeyDown(KeyCode.A))
+                RPCSendCommandMoveServer(Vector2.left);
+            else if(Input.GetKeyDown(KeyCode.W))
+                RPCSendCommandMoveServer(Vector2.up);
+            else if(Input.GetKeyDown(KeyCode.S))
+                RPCSendCommandMoveServer(Vector2.down);
+            
+            if (Input.GetKeyDown(KeyCode.LeftControl))
             {
                 _entityData.CreatureSprites.SpriteAddressableKey = "warforgedmage";
                 RPCSetPlayerDataServer(_entityData);
@@ -119,6 +125,31 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
         {
             _disableNetworkObjects.EnableOwnerObjects(base.IsOwner);
         }
+    }
+
+    [ServerRpc]
+    public void RPCSendCommandMoveServer(Vector2 dir)
+    {
+        RPCSendCommandMoveClient(dir);
+    }
+    
+    [ObserversRpc]
+    public void RPCSendCommandMoveClient(Vector2 dir)
+    {
+        SetMovement(dir);
+    }
+
+    [ServerRpc]
+    public void RPCEndPlayerTurnServer()
+    {
+        RPCEndPlayerTurnClient();   
+    }
+
+    [ObserversRpc]
+    void RPCEndPlayerTurnClient()
+    {
+        var tickManager = ServiceLocator.Get<IServiceTickManager>();
+        tickManager.ManualTick();
     }
 
     // [ServerRpc]
