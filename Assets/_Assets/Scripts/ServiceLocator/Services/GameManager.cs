@@ -24,8 +24,8 @@ namespace FearProj.ServiceLocator
             ServiceLocator.Register<IServicePlayerManager>();
             ServiceLocator.Register<IServiceTickManager>();
             ServiceLocator.Register<IServiceNetworkManager>();
-            ServiceLocator.Register<IServiceNetworkSpawner>();
             ServiceLocator.Register<IServiceSceneManager>();
+            ServiceLocator.Register<IServiceCreatureManager>();
         }
     }
 }

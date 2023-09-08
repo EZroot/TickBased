@@ -6,19 +6,25 @@ using UnityEngine;
 public class PlayerEntity : CreatureEntity<PlayerEntityData>
 {
     [SerializeField] private DisableNetworkObjects _disableNetworkObjects;
+    [SerializeField] private GameObject[] _objectsInRange;
     void Awake()
     {
         var sceneManager = ServiceLocator.Get<IServiceSceneManager>();
         sceneManager.OnSceneFinishedLoading += On_SceneLoad;
     }
 
-    void Start()
+    public override void Start()
     {
+        base.Start();
+        Logger.Log("Start called", "PlayerEntity");
         var playerManager = ServiceLocator.Get<IServicePlayerManager>();
 
         playerManager.AddPlayer(this);
 
         OnEntityDataChanged += SaveEntityData;
+
+        var tickManager = ServiceLocator.Get<IServiceTickManager>();
+        tickManager.OnTick += OnTick_Collision;
     }
 
     void Update()
@@ -39,6 +45,38 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
                 _entityData.CreatureSprites.SpriteAddressableKey = "warforgedmage";
                 RPCSetPlayerDataServer(_entityData);
             }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                //attack everything except ourselves
+                foreach (var obj in _objectsInRange)
+                {
+                    var ecp = obj.GetComponent<EntityColliderPlayer>();
+                    var target = ecp.GetEntity();
+                    var targetID = target.UniqueID;
+                    if (target != null && targetID != _entityData.UniqueID)
+                        RPCSendCommandAttackServer(target.UniqueID, 10);
+                }
+            }
+        }
+    }
+
+    void OnTick_Collision()
+    {
+        Logger.Log("Checking collision..", "PlayerEntity:OnTick_Collision");
+        // Define the position and radius
+        Vector2 position = CreatureTransform.position;
+        float radius = 1f;
+
+        // Perform the OverlapCircleAll
+        Collider2D[] hits = Physics2D.OverlapCircleAll(position, radius);
+        _objectsInRange = new GameObject[hits.Length];
+        // Process the hits
+        for (int i = 0; i < hits.Length; i++)
+        {
+            // Do something with each object that was hit
+            Logger.Log("Hit: " + hits[i].gameObject.name, "PlayerEntity:OnTick_Collision");
+            _objectsInRange[i] = hits[i].gameObject;
         }
     }
 
@@ -127,6 +165,19 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
         }
     }
 
+    [ServerRpc]
+    public void RPCSendCommandAttackServer(string targetCreatureUniqueID, int damage)
+    {
+        RPCSendCommandAttackClient(targetCreatureUniqueID,damage);
+    }
+    
+    [ObserversRpc]
+    public void RPCSendCommandAttackClient(string targetCreatureUniqueID, int damage)
+    {
+        Logger.Log($"AttackClient {targetCreatureUniqueID}", "PlayerEntity:RPCSendCommandAttackClient");
+        AttackCreature(targetCreatureUniqueID, damage);
+    }
+    
     [ServerRpc]
     public void RPCSendCommandMoveServer(Vector2 dir)
     {

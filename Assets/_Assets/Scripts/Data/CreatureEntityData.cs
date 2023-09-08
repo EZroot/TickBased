@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class CreatureEntityData : EntityData
 {
+    public string UniqueID;
     public ClientStats ClientStats;
     public CreatureStats CreatureStats;
     public CreatureSprites CreatureSprites;
@@ -28,6 +29,11 @@ public class CreatureEntityData : EntityData
     public void SetCreatureStats(CreatureStats stats)
     {
         CreatureStats = new CreatureStats(stats);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        CreatureStats.CreatureLimbs[0].Health -= damage;
     }
 }
 
@@ -62,7 +68,8 @@ public class CreatureStats
 {
     public string Name;
     public float MovementSpeed;
-
+    public CreatureLimbsData[] CreatureLimbs;
+    
     public CreatureStats()
     {
 
@@ -72,17 +79,43 @@ public class CreatureStats
     {
         this.Name = stats.Name;
         this.MovementSpeed = stats.MovementSpeed;
+        this.CreatureLimbs = stats.CreatureLimbs;
     }
-    public CreatureStats(string name, float movementSpeed)
+
+    public CreatureStats(string name, float movementSpeed, CreatureLimbsData[] limbs)
     {
         this.Name = name;
         this.MovementSpeed = movementSpeed;
+        this.CreatureLimbs = limbs;
     }
 
     public void SetMovementSpeed(float movementSpeed)
     {
         this.MovementSpeed = movementSpeed;
     }
+
+    [System.Serializable]
+    public struct CreatureLimbsData
+    {
+        public string LimbName;
+        public int Health;
+        public int Armour;
+        public bool IsAttached;
+        public CreatureLimbType LimbType;
+    }
+    
+    public enum CreatureLimbType
+    {
+        Head,
+        Eyes,
+        Ears,
+        Hands,
+        Arm,
+        Leg,
+        Torso,
+        Groin
+    }
+
 }
 
 [System.Serializable]

@@ -15,12 +15,79 @@ MonoBehaviour:
   _playerEntityData:
     ID: dev_player
     IDHash: 
+    UniqueID: 
     ClientStats:
       ClientId: 0
       Username: 
     CreatureStats:
-      Name: asdsadasd
-      MovementSpeed: 4
+      Name: Warforged
+      MovementSpeed: 30
+      CreatureLimbs:
+      - LimbName: Head
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 0
+      - LimbName: Left Eye
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 1
+      - LimbName: Right Eye
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 1
+      - LimbName: Left Ear
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 2
+      - LimbName: Right Ear
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 2
+      - LimbName: Left Hand
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 3
+      - LimbName: Right Hand
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 3
+      - LimbName: Left Arm
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 4
+      - LimbName: Right Arm
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 4
+      - LimbName: Left Leg
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 5
+      - LimbName: Right Leg
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 5
+      - LimbName: Torso
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 6
+      - LimbName: Groin
+        Health: 100
+        Armour: 0
+        IsAttached: 1
+        LimbType: 7
     CreatureSprites:
       SpriteAddressableKey: warforgedboss
       ArmourAddressableKey: 
