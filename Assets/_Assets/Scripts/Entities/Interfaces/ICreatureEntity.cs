@@ -7,4 +7,8 @@
         CreatureEntityData EntityData { get; }
         Transform CreatureTransform { get; }
         void SetDirection(Quaternion dir);
+
+        void HighlightCreature();
+        void UnHighlightCreature();
+
     }

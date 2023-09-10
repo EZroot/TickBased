@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using TickBased.Scripts.Commands;
 using UnityEngine;
 
@@ -9,25 +10,73 @@ namespace FearProj.ServiceLocator
 {
     public class TickManager : MonoBehaviour, IServiceTickManager
     {
-        public event Action OnTick;
-        private List<ICommand> commandQueue = new List<ICommand>();
-        private int currentTick = 0;
-        private WaitForSeconds _commandDelay = new WaitForSeconds(0.25f);
-
-        private bool _isExecutingCommands = false;
+        public enum TickMode
+        {
+            RealTime,
+            Manual
+        }
         
-        public void QueueCommand(ICommand command)
+        private Dictionary<int, List<ICommand>> _commandQueue = new Dictionary<int, List<ICommand>>();
+        private int _currentTick = 0;
+        private WaitForSeconds _commandDelay = new WaitForSeconds(0.25f);
+        private WaitForSeconds _realTimeTickDelay = new WaitForSeconds(1f);
+
+        //temporarily serilaizable so we can mess with it in debug
+        [SerializeField] private TickMode _tickMode;
+        private bool _isExecutingCommands = false;
+        private Coroutine _realTimeTickCoroutine;
+
+        public event Action OnTick;
+        public event Action OnCommandExecuted;
+        public int CurrentTick => _currentTick;
+        public TickMode TickExecutionMode
+        {
+            get => _tickMode;
+            set
+            {
+                if (_tickMode != value)
+                {
+                    if(_tickMode == TickMode.RealTime && _realTimeTickCoroutine != null)
+                    {
+                        StopCoroutine(_realTimeTickCoroutine);
+                    }
+
+                    // Start new real-time coroutine if switching to real-time mode
+                    if(value == TickMode.RealTime)
+                    {
+                        _realTimeTickCoroutine = StartCoroutine(RealTimeTickCoroutine());
+                    }
+                }
+                _tickMode = value;
+            }
+        }
+        
+        private void Start()
+        {
+            if (_tickMode == TickMode.RealTime)
+            {
+                _realTimeTickCoroutine = StartCoroutine(RealTimeTickCoroutine());
+            }
+        }
+        
+        public void QueueCommand(ICommand command, int tickToExecute)
         {
             Logger.Log($"Added command {command.GetType()}", "TickManager");
-            commandQueue.Add(command);
-        }
+            if (!_commandQueue.ContainsKey(tickToExecute))
+            {
+                _commandQueue[tickToExecute] = new List<ICommand>();
+            }
+            _commandQueue[tickToExecute].Add(command);        }
         
         public void ManualTick()
         {
             if (_isExecutingCommands)
                 return;
-            OnTick?.Invoke();
+            
+            Logger.Log($"Manual Tick called {_currentTick} ", "TickManager");
             ExecuteCommands();
+            OnTick?.Invoke(); //collisions and shit should happen after movement?
+            _currentTick++;
         }
 
         private void ExecuteCommands()
@@ -36,19 +85,36 @@ namespace FearProj.ServiceLocator
             //commandQueue = commandQueue.OrderBy(c => c.Priority).ToList();
 
             // Use a MonoBehaviour to start the Coroutine
-            StartCoroutine(ExecuteCommandsCoroutine());
+            if (_commandQueue.ContainsKey(_currentTick))
+            {
+                StartCoroutine(ExecuteCommandsCoroutine(_commandQueue[_currentTick]));
+                _commandQueue.Remove(_currentTick);
+            }
         }
 
-        private IEnumerator ExecuteCommandsCoroutine()
+        private IEnumerator RealTimeTickCoroutine()
+        {
+            while (_tickMode == TickMode.RealTime)
+            {
+                if (!_isExecutingCommands)
+                {
+                    ManualTick();
+                }
+                yield return _realTimeTickDelay;
+            }
+        }
+
+        private IEnumerator ExecuteCommandsCoroutine(List<ICommand> commandsToExecute)
         {
             _isExecutingCommands = true;
-            foreach (var command in commandQueue)
+            foreach (var command in commandsToExecute)
             {
                 yield return StartCoroutine(command.Execute());
-                yield return _commandDelay;
-            }
+                OnCommandExecuted?.Invoke();
 
-            commandQueue.Clear();
+                if (TickExecutionMode == TickMode.Manual)
+                    yield return _commandDelay;
+            }
             _isExecutingCommands = false;
         }
     }

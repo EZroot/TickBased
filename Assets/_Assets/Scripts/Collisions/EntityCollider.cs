@@ -1,14 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
-public class EntityCollider<T> : MonoBehaviour where T : CreatureEntityData
+public class EntityCollider : MonoBehaviour
 {
-    //should just make this a IEntityCreature or whatever like the attack command
-    [SerializeField] private CreatureEntity<T> _creatureEntity;
+    [SerializeField] private GameObject _creatureEntity;
+    [ShowInInspector] private ICreatureEntity _creatureEntityInterface;
 
-    public CreatureEntity<T> GetEntity()
+    void Start()
     {
-        return _creatureEntity;
+        _creatureEntityInterface = _creatureEntity.GetComponent<ICreatureEntity>();
+    }
+    
+    public ICreatureEntity GetEntity()
+    {
+        return _creatureEntityInterface;
     }
 }

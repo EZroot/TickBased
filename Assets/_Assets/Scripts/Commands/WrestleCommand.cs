@@ -3,17 +3,17 @@ using UnityEngine;
 
 namespace TickBased.Scripts.Commands
 {
-    public class AttackCommand : ICommand 
+    public class WrestleCommand : ICommand 
     {
         public int Priority => 1; // set your priority here
         private ICreatureEntity _currentCreatureEntity;
         private ICreatureEntity _targetCreatureEntity;
-        private CreatureEntityData.AttackType _attackType;
+        private CreatureEntityData.WrestleType _wrestleType;
         private int _attackDamage;
         private string _targetLimbName;
-        public AttackCommand(ICreatureEntity currentCreature,
+        public WrestleCommand(ICreatureEntity currentCreature,
             ICreatureEntity targetCreature,
-            CreatureEntityData.AttackType attackType,
+            CreatureEntityData.WrestleType wrestleType,
             int attackDamage,
             string targetLimbName)
         {
@@ -22,7 +22,7 @@ namespace TickBased.Scripts.Commands
             this._attackDamage = attackDamage;
             this._currentCreatureEntity = currentCreature;
             this._targetCreatureEntity = targetCreature;
-            this._attackType = attackType;
+            this._wrestleType = wrestleType;
             this._targetLimbName = targetLimbName;
         }
 
@@ -42,7 +42,7 @@ namespace TickBased.Scripts.Commands
 
 
             // Apply damage logic
-            _targetCreatureEntity.EntityData.ActionDamage(_attackType,_targetLimbName,_attackDamage);
+            _targetCreatureEntity.EntityData.ActionWrestle(_wrestleType,_targetLimbName,_attackDamage);
 
             // Lerp back to original position
             float lerpDuration = 0.25f;

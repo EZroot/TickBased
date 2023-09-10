@@ -15,6 +15,9 @@ namespace FearProj.ServiceLocator
         void Initialize()
         {
             LoadServices();
+            var uiManager = ServiceLocator.Get<IServiceUIManager>();
+            var sceneManager = ServiceLocator.Get<IServiceSceneManager>();
+            sceneManager.OnSceneFinishedLoading += uiManager.Initialize;
         }
 
         void LoadServices()
@@ -26,6 +29,7 @@ namespace FearProj.ServiceLocator
             ServiceLocator.Register<IServiceNetworkManager>();
             ServiceLocator.Register<IServiceSceneManager>();
             ServiceLocator.Register<IServiceCreatureManager>();
+            ServiceLocator.Register<IServiceUIManager>();
         }
     }
 }

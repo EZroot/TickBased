@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerEntity : CreatureEntity<PlayerEntityData>
 {
     [SerializeField] private DisableNetworkObjects _disableNetworkObjects;
-    [SerializeField] private GameObject[] _objectsInRange;
+
     void Awake()
     {
         var sceneManager = ServiceLocator.Get<IServiceSceneManager>();
@@ -24,22 +24,40 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
         OnEntityDataChanged += SaveEntityData;
 
         var tickManager = ServiceLocator.Get<IServiceTickManager>();
-        tickManager.OnTick += OnTick_Collision;
+        tickManager.OnCommandExecuted +=
+            OnCommandExecuted_CollisionUpdate; //were doin this to check collision after every movement/attack
+        OnGhostEntityMovement += OnGhostEntityMovement_CollisionUpdate; //updating our ghost so we can execute commands
     }
 
     void Update()
     {
         if (base.IsOwner)
         {
-            if(Input.GetKeyDown(KeyCode.D))
-                RPCSendCommandMoveServer(Vector2.right);
-            else if(Input.GetKeyDown(KeyCode.A))
-                RPCSendCommandMoveServer(Vector2.left);
-            else if(Input.GetKeyDown(KeyCode.W))
-                RPCSendCommandMoveServer(Vector2.up);
-            else if(Input.GetKeyDown(KeyCode.S))
-                RPCSendCommandMoveServer(Vector2.down);
-            
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                var tickManager = ServiceLocator.Get<IServiceTickManager>();
+                var isRealTime = tickManager.TickExecutionMode == TickManager.TickMode.RealTime;
+                RPCSendCommandMoveServer(Vector2.right,isRealTime);
+            }
+            else if (Input.GetKeyDown(KeyCode.A))
+            {
+                var tickManager = ServiceLocator.Get<IServiceTickManager>();
+                var isRealTime = tickManager.TickExecutionMode == TickManager.TickMode.RealTime;
+                RPCSendCommandMoveServer(Vector2.left,isRealTime);
+            }
+            else if (Input.GetKeyDown(KeyCode.W))
+            {
+                var tickManager = ServiceLocator.Get<IServiceTickManager>();
+                var isRealTime = tickManager.TickExecutionMode == TickManager.TickMode.RealTime;
+                RPCSendCommandMoveServer(Vector2.up,isRealTime);
+            }
+            else if (Input.GetKeyDown(KeyCode.S))
+            {
+                var tickManager = ServiceLocator.Get<IServiceTickManager>();
+                var isRealTime = tickManager.TickExecutionMode == TickManager.TickMode.RealTime;
+                RPCSendCommandMoveServer(Vector2.down,isRealTime);
+            }
+
             if (Input.GetKeyDown(KeyCode.LeftControl))
             {
                 _entityData.CreatureSprites.SpriteAddressableKey = "warforgedmage";
@@ -49,35 +67,22 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 //attack everything except ourselves
-                foreach (var obj in _objectsInRange)
+                foreach (var obj in _objectsInRangeGhost)
                 {
-                    var ecp = obj.GetComponent<EntityColliderPlayer>();
+                    var ecp = obj.GetComponent<EntityCollider>();
                     var target = ecp.GetEntity();
                     var targetID = target.UniqueID;
                     if (target != null && targetID != _entityData.UniqueID)
-                        RPCSendCommandAttackServer(target.UniqueID, 10);
+                        RPCSendCommandAttackServer(targetID, CreatureEntityData.AttackType.Bludgeon, "Head", 10);
                 }
             }
         }
     }
 
-    void OnTick_Collision()
+    void OnDrawGizmos()
     {
-        Logger.Log("Checking collision..", "PlayerEntity:OnTick_Collision");
-        // Define the position and radius
-        Vector2 position = CreatureTransform.position;
-        float radius = 1f;
-
-        // Perform the OverlapCircleAll
-        Collider2D[] hits = Physics2D.OverlapCircleAll(position, radius);
-        _objectsInRange = new GameObject[hits.Length];
-        // Process the hits
-        for (int i = 0; i < hits.Length; i++)
-        {
-            // Do something with each object that was hit
-            Logger.Log("Hit: " + hits[i].gameObject.name, "PlayerEntity:OnTick_Collision");
-            _objectsInRange[i] = hits[i].gameObject;
-        }
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(CreatureTransform.position, _collisionRadius);
     }
 
     void OnDestroy()
@@ -110,7 +115,7 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
             playerManager.SetClientStats(connection.ClientId, playerManager.ClientStats.Username);
 
             _entityData.SetClientStats(playerManager.ClientStats);
-            
+
             RPCSetPlayerDataServer(_entityData);
 
             var sceneManager = ServiceLocator.Get<IServiceSceneManager>();
@@ -134,6 +139,98 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
             }
         }
     }
+
+    protected override void OnGhostEntityMovement_CollisionUpdate()
+    {
+        base.OnGhostEntityMovement_CollisionUpdate();
+
+        if (base.IsOwner)
+        {
+            var uiManager = ServiceLocator.Get<IServiceUIManager>();
+
+            //clear interaction choices
+            uiManager.UIInteractionChoiceManager.RemoveAllInteractionChoices();
+
+            //creature interaction choices
+            foreach (var creatures in _objectsInRangeGhost)
+            {
+                var collider = creatures.GetComponent<EntityCollider>();
+                var creature = collider.GetEntity();
+                uiManager.UIInteractionChoiceManager.SpawnInteractionChoice(this,
+                    creature,
+                    $"Interact {creature.EntityData.CreatureStats.Name}",
+                    () =>
+                    {
+                        //we can add the UI changes here
+                        //Select entity -> Select Action (Wrestle/etc/) -> Selection specifics -> Roll chance, do attack success/fail
+                        //RPCSendCommandAttackServer(creature.UniqueID, CreatureEntityData.AttackType.Bludgeon, "Head", 10);
+                        Interaction_SpawnInteractionChoices(creature);
+                    });
+            }
+        }
+    }
+
+    #region -- Creature Collision Interactions --
+    void Interaction_SpawnInteractionChoices(ICreatureEntity interactionTarget)
+    {
+        var uiManager = ServiceLocator.Get<IServiceUIManager>();
+        uiManager.UIInteractionChoiceManager.RemoveAllInteractionChoices();
+        uiManager.UIInteractionChoiceManager.SpawnInteractionChoice(this, interactionTarget,
+            $"Attack {interactionTarget.EntityData.CreatureStats.Name}",
+            ()=>
+            {
+                Interaction_SpawnSubActions_Attack(CreatureEntityData.AttackType.Bludgeon, interactionTarget);
+            });
+        uiManager.UIInteractionChoiceManager.SpawnInteractionChoice(this, interactionTarget,
+            $"Wrestle {interactionTarget.EntityData.CreatureStats.Name}",
+            ()=>
+            {
+                Interaction_SpawnSubActions_Wrestle(CreatureEntityData.WrestleType.Grab, interactionTarget);
+            });
+        uiManager.UIInteractionChoiceManager.SpawnInteractionChoice(this, interactionTarget,
+            $"Examine {interactionTarget.EntityData.CreatureStats.Name}",
+            ()=>
+            {
+                Logger.Log("Youre too dumb to examine this creature");
+            });
+        uiManager.UIInteractionChoiceManager.SpawnInteractionChoice(this, interactionTarget,
+            $"Speak {interactionTarget.EntityData.CreatureStats.Name}",
+            ()=>
+            {
+                Logger.Log("The creature is not interested in speaking with you");
+            });
+    }
+
+    void Interaction_SpawnSubActions_Attack(CreatureEntityData.AttackType attackType, ICreatureEntity attackTarget)
+    {
+        var uiManager = ServiceLocator.Get<IServiceUIManager>();
+        uiManager.UIInteractionChoiceManager.RemoveAllInteractionChoices();
+
+        foreach (var limb in attackTarget.EntityData.CreatureStats.CreatureLimbs)
+        {
+            uiManager.UIInteractionChoiceManager.SpawnInteractionChoice(this, attackTarget,
+                $"{attackType.ToString()} {limb.LimbName} of {attackTarget.EntityData.CreatureStats.Name}",
+                () =>
+                {
+                    RPCSendCommandAttackServer(attackTarget.UniqueID, attackType, limb.LimbName, 10); });
+        }
+    }
+    
+    void Interaction_SpawnSubActions_Wrestle(CreatureEntityData.WrestleType wrestleType, ICreatureEntity attackTarget)
+    {
+        var uiManager = ServiceLocator.Get<IServiceUIManager>();
+        uiManager.UIInteractionChoiceManager.RemoveAllInteractionChoices();
+
+        foreach (var limb in attackTarget.EntityData.CreatureStats.CreatureLimbs)
+        {
+            uiManager.UIInteractionChoiceManager.SpawnInteractionChoice(this, attackTarget,
+                $"{wrestleType.ToString()} {limb.LimbName} of {attackTarget.EntityData.CreatureStats.Name}",
+                () =>
+                {
+                    RPCSendCommandWrestleServer(attackTarget.UniqueID, wrestleType, limb.LimbName, 10); });
+        }
+    }
+    #endregion
     
     [ServerRpc]
     void RPCSetPlayerDataServer(PlayerEntityData data)
@@ -147,7 +244,7 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
         Logger.Log("Setting Entity Data", "RPCSetPlayerDataClient");
         SetEntityData(data);
     }
-    
+
     [ServerRpc]
     void RPCSetPlayerBodyEnabledServer(bool isEnabled)
     {
@@ -166,34 +263,21 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
     }
 
     [ServerRpc]
-    public void RPCSendCommandAttackServer(string targetCreatureUniqueID, int damage)
+    public void RPCSendCommandMoveServer(Vector2 dir, bool useGhostPrediction)
     {
-        RPCSendCommandAttackClient(targetCreatureUniqueID,damage);
+        RPCSendCommandMoveClient(dir,useGhostPrediction);
     }
-    
+
     [ObserversRpc]
-    public void RPCSendCommandAttackClient(string targetCreatureUniqueID, int damage)
+    public void RPCSendCommandMoveClient(Vector2 dir,bool useGhostPrediction)
     {
-        Logger.Log($"AttackClient {targetCreatureUniqueID}", "PlayerEntity:RPCSendCommandAttackClient");
-        AttackCreature(targetCreatureUniqueID, damage);
-    }
-    
-    [ServerRpc]
-    public void RPCSendCommandMoveServer(Vector2 dir)
-    {
-        RPCSendCommandMoveClient(dir);
-    }
-    
-    [ObserversRpc]
-    public void RPCSendCommandMoveClient(Vector2 dir)
-    {
-        SetMovement(dir);
+        SetMovement(dir, useGhostPrediction);
     }
 
     [ServerRpc]
     public void RPCEndPlayerTurnServer()
     {
-        RPCEndPlayerTurnClient();   
+        RPCEndPlayerTurnClient();
     }
 
     [ObserversRpc]

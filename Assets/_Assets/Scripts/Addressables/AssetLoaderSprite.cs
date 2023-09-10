@@ -7,7 +7,7 @@ using UnityEngine.AddressableAssets;
 public class AssetLoaderSprite : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _spriteRenderer;
-
+    public SpriteRenderer SpriteRenderer => _spriteRenderer;
     public void LoadAssetCoroutine(string addressableKey)
     {
         StartCoroutine(LoadAssetEnumerator(addressableKey));

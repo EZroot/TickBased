@@ -30,4 +30,14 @@ public class EntityWearables : MonoBehaviour
                 break;
         }
     }
+
+    public void HighlightSprite()
+    {
+        _entitySprite.SpriteRenderer.color = Color.yellow;
+    }
+
+    public void UnHighlightSprite()
+    {
+        _entitySprite.SpriteRenderer.color = Color.white;
+    }
 }
