@@ -15,6 +15,7 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
     public Action OnGhostEntityMovement;
     public CreatureEntityData EntityData => _entityData;
     public string UniqueID => EntityData.UniqueID;
+    public bool IsInitialized => EntityData != null || EntityData.UniqueID != String.Empty;
 
     public Transform CreatureTransform => _creatureTransform;
     public Transform GhostTransform => _ghostTransform;
@@ -73,11 +74,16 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
 
     protected void SetMovement(Vector2 direction, bool useGhostPrediction = true)
     {
+        var tickManager = ServiceLocator.Get<IServiceTickManager>();
+        var uniqueId = EntityData.UniqueID;
+        var canIssueCommand = tickManager.CheckIfCreatureCanIssueCommandThisTick(uniqueId);
+        if (canIssueCommand == false)
+            return;
+        
         _currentGridPosition += direction;
         var moveCommand = new MoveCommand(_creatureTransform, _currentGridPosition);
 
-        var tickManager = ServiceLocator.Get<IServiceTickManager>();
-        tickManager.QueueCommand(moveCommand, tickManager.CurrentTick); //might need to send the current tick to make sure its synced..
+        tickManager.QueueCommand(uniqueId, moveCommand, tickManager.CurrentTick); //might need to send the current tick to make sure its synced..
 
         if (useGhostPrediction)
         {
@@ -96,20 +102,30 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
 
     protected void AttackCreature(string targetCreatureUniqueID, CreatureEntityData.AttackType attackType, string limbName, int damage)
     {
+        var tickManager = ServiceLocator.Get<IServiceTickManager>();
+        var uniqueId = EntityData.UniqueID;
+        var canIssueCommand = tickManager.CheckIfCreatureCanIssueCommandThisTick(uniqueId);
+        if (canIssueCommand == false)
+            return;
+        
         var creatureManager = ServiceLocator.Get<IServiceCreatureManager>();
         var creatureData = creatureManager.GetCreature(targetCreatureUniqueID);
         var attackCommand = new AttackCommand(this, creatureData, attackType, damage, limbName);
-        var tickManager = ServiceLocator.Get<IServiceTickManager>();
-        tickManager.QueueCommand(attackCommand, tickManager.CurrentTick);
+        tickManager.QueueCommand(uniqueId, attackCommand, tickManager.CurrentTick);
     }
     
     protected void WrestleCreature(string targetCreatureUniqueID, CreatureEntityData.WrestleType wrestleType, string limbName, int damage)
     {
+        var tickManager = ServiceLocator.Get<IServiceTickManager>();
+        var uniqueId = EntityData.UniqueID;
+        var canIssueCommand = tickManager.CheckIfCreatureCanIssueCommandThisTick(uniqueId);
+        if (canIssueCommand == false)
+            return;
+        
         var creatureManager = ServiceLocator.Get<IServiceCreatureManager>();
         var creatureData = creatureManager.GetCreature(targetCreatureUniqueID);
         var wrestleCommand = new WrestleCommand(this, creatureData, wrestleType, damage, limbName);
-        var tickManager = ServiceLocator.Get<IServiceTickManager>();
-        tickManager.QueueCommand(wrestleCommand, tickManager.CurrentTick);
+        tickManager.QueueCommand(uniqueId, wrestleCommand, tickManager.CurrentTick);
     }
     
     public override void SetEntityData(T data)

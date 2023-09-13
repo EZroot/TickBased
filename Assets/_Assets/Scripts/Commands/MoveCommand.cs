@@ -11,7 +11,7 @@ namespace TickBased.Scripts.Commands
 
         public MoveCommand(Transform entityTransform, Vector2 targetPosition)
         {
-            Logger.Log($"Movement Command Set {entityTransform.root.gameObject.name} {targetPosition}");
+//            Logger.Log($"Movement Command Set {entityTransform.root.gameObject.name} {targetPosition}");
             this.entityTransform = entityTransform;
             this.targetPosition = targetPosition;
         }

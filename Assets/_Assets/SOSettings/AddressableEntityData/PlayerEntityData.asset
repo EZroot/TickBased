@@ -16,6 +16,7 @@ MonoBehaviour:
     ID: dev_player
     IDHash: 
     UniqueID: 
+    IsPlayer: 1
     ClientStats:
       ClientId: 0
       Username: 
