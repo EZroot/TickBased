@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using TickBased.Addressables;
 using UnityEngine;
 
 public class EntityWearables : MonoBehaviour

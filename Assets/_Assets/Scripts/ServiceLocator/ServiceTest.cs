@@ -19,7 +19,7 @@ public class ServiceTest : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.T))
         {
-            Logger.Log("D");
+            TickBased.Logger.Logger.Log("D");
             //ServiceLocator.Get<IServicePlayerManager>().TestFunc();
             //ServiceLocator.Get<IServiceDataManager>().TestFunc();
         }

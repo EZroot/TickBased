@@ -35,7 +35,7 @@ namespace FearProj.ServiceLocator
             else
                 _fishnetNetworkManager.ServerManager.StartConnection();
 
-            Logger.Log($"Server Status: <color=blue>{_serverState.ToString()}</color>");
+            TickBased.Logger.Logger.Log($"Server Status: <color=blue>{_serverState.ToString()}</color>");
         }
 
 
@@ -50,7 +50,7 @@ namespace FearProj.ServiceLocator
             {    
                 _fishnetNetworkManager.ClientManager.StartConnection();
             }
-            Logger.Log($"Server Status: <color=blue>{_clientState.ToString()}</color>");
+            TickBased.Logger.Logger.Log($"Server Status: <color=blue>{_clientState.ToString()}</color>");
         }
 
         void OnClientStarted(ClientConnectionStateArgs args)

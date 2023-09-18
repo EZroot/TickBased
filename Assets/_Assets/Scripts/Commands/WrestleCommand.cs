@@ -17,7 +17,7 @@ namespace TickBased.Scripts.Commands
             int attackDamage,
             string targetLimbName)
         {
-            Logger.Log($"Attack Command Set {currentCreature.EntityData.CreatureStats.Name} " +
+            TickBased.Logger.Logger.Log($"Attack Command Set {currentCreature.EntityData.CreatureStats.Name} " +
                        $"Vs {targetCreature.EntityData.CreatureStats.Name}");
             this._attackDamage = attackDamage;
             this._currentCreatureEntity = currentCreature;

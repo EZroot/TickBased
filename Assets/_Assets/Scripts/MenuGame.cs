@@ -41,7 +41,7 @@ public class MenuGame : MonoBehaviour
             var clientId = connection.ClientId;
             var address = connection.GetAddress();
             var username = _usernameInputField.text;
-            Logger.Log($"OnConnectedClient: {username} {clientId} {address}");
+            TickBased.Logger.Logger.Log($"OnConnectedClient: {username} {clientId} {address}");
         }
     }
 }

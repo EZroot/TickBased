@@ -1,19 +1,22 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-public static class DataUtils
+namespace TickBased.Utils
 {
-    public static T DeepCopy<T>(T source)
+    public static class DataUtils
     {
-        if (source == null)
-            return default(T);
-
-        var formatter = new BinaryFormatter();
-        using (var stream = new MemoryStream())
+        public static T DeepCopy<T>(T source)
         {
-            formatter.Serialize(stream, source);
-            stream.Seek(0, SeekOrigin.Begin);
-            return (T)formatter.Deserialize(stream);
+            if (source == null)
+                return default(T);
+
+            var formatter = new BinaryFormatter();
+            using (var stream = new MemoryStream())
+            {
+                formatter.Serialize(stream, source);
+                stream.Seek(0, SeekOrigin.Begin);
+                return (T)formatter.Deserialize(stream);
+            }
         }
     }
 }

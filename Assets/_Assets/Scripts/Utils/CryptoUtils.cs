@@ -1,22 +1,25 @@
 using System.Security.Cryptography;
 using System.Text;
 
-public static class CryptoUtils
+namespace TickBased.Utils
 {
-    public static string GenerateSHA256Hash(string input)
+    public static class CryptoUtils
     {
-        using (SHA256 sha256 = SHA256.Create())
+        public static string GenerateSHA256Hash(string input)
         {
-            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
-            byte[] hashBytes = sha256.ComputeHash(inputBytes);
-
-            StringBuilder sb = new StringBuilder();
-            foreach (byte b in hashBytes)
+            using (SHA256 sha256 = SHA256.Create())
             {
-                sb.Append(b.ToString("x2")); // Convert each byte to a two-digit hexadecimal representation
-            }
+                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+                byte[] hashBytes = sha256.ComputeHash(inputBytes);
 
-            return sb.ToString();
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in hashBytes)
+                {
+                    sb.Append(b.ToString("x2")); // Convert each byte to a two-digit hexadecimal representation
+                }
+
+                return sb.ToString();
+            }
         }
     }
 }

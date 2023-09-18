@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: DataSettings
   m_EditorClassIdentifier: 
   _addressableEntityDataSettingLabel: entitydataso
-  dataPath:
-  - /Data/
-  assetPath:
-  - /Assets/
+  dataPath: /TickBased_SavedGame/Data/
+  assetPath: /TickBased_SavedGame/Raw/Assets/
+  localDevAssetsToCopy: /_Assets/LocalDevAssetsToCopy/

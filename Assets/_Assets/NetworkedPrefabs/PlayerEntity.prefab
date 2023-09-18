@@ -195,6 +195,7 @@ GameObject:
   - component: {fileID: 2503157616575493550}
   - component: {fileID: 1015431093334932365}
   - component: {fileID: 2391866386375203702}
+  - component: {fileID: 6297865218613340921}
   m_Layer: 0
   m_Name: Pixel Perfect Camera
   m_TagString: Untagged
@@ -253,7 +254,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 12
+  orthographic size: 16
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -313,6 +314,22 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
+--- !u!114 &6297865218613340921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3289175715866530583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 748286bc87ac8ab4c8d1a200d99898de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterTransform: {fileID: 2058196522286725281}
+  ghostTransform: {fileID: 8438461687236905312}
+  smoothSpeed: 0.125
+  offset: {x: 0, y: 0, z: -5}
 --- !u!1 &3419350767850265343
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,6 +341,7 @@ GameObject:
   - component: {fileID: 1537814254803570716}
   - component: {fileID: 8399575382468513345}
   - component: {fileID: 6088649063544043170}
+  - component: {fileID: 619928633601238556}
   - component: {fileID: 6056206215942693030}
   - component: {fileID: 1590043994149602296}
   m_Layer: 0
@@ -404,6 +422,25 @@ MonoBehaviour:
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 1590043994149602296}
   _networkObjectCache: {fileID: 1590043994149602296}
+  _timeLimitForCommand: 1
+--- !u!114 &619928633601238556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3419350767850265343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67207a7416234c569d3b035fb39be226, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 2
+  _addedNetworkObject: {fileID: 1590043994149602296}
+  _networkObjectCache: {fileID: 1590043994149602296}
+  _gridSize: 64
+  _tileSize: 2
+  _seed: 6969
 --- !u!114 &6056206215942693030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -437,6 +474,7 @@ MonoBehaviour:
   _networkBehaviours:
   - {fileID: 8399575382468513345}
   - {fileID: 6088649063544043170}
+  - {fileID: 619928633601238556}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   SerializedTransformProperties:
@@ -1807,7 +1845,7 @@ Canvas:
   m_GameObject: {fileID: 7443602911478888287}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 1
+  m_RenderMode: 0
   m_Camera: {fileID: 1015431093334932365}
   m_PlaneDistance: 100
   m_PixelPerfect: 0

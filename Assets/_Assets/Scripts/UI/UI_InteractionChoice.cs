@@ -33,7 +33,7 @@ public class UI_InteractionChoice : MonoBehaviour
     {
         if (_referenceInteractionCreature == null)
         {
-            Logger.LogError("Failed to Unhighlight sprite!","UI_InteractionChoice");
+            TickBased.Logger.Logger.LogError("Failed to Unhighlight sprite!","UI_InteractionChoice");
             return;
         }
         _referenceInteractionCreature.HighlightCreature();
@@ -43,7 +43,7 @@ public class UI_InteractionChoice : MonoBehaviour
     {
         if (_referenceInteractionCreature == null)
         {
-            Logger.LogError("Failed to Unhighlight sprite!","UI_InteractionChoice");
+            TickBased.Logger.Logger.LogError("Failed to Unhighlight sprite!","UI_InteractionChoice");
             return;
         }
         _referenceInteractionCreature.UnHighlightCreature();

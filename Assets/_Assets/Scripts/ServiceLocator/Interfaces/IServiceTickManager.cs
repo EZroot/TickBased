@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections;
 using TickBased.Scripts.Commands;
 
 namespace FearProj.ServiceLocator
 {
     public interface IServiceTickManager : IService
     {
-        public event Action OnTick;
+        public event Action PreTick;
+        public event Action PostTick;
         public event TickManager.CommandReceivedHandler OnCommandReceived;
         public event Action OnCommandExecuted;
         public int CurrentTick { get; }
+        public bool IsExecutingTick { get; }
         public TickManager.TickMode TickExecutionMode { get; set; }
         public void QueueCommand(string creatureUniqueID, ICommand command, int tickToExecute);
         public void ManualTick();

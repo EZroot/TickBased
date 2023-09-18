@@ -15,7 +15,7 @@ public class BootstrapGame : MonoBehaviour
     {
         var datamgr = ServiceLocator.Get<IServiceDataManager>();
         await datamgr.LoadAndProcessData();
-        Logger.Log("Bootstrap: Data loaded success.", "BootstrapGame LoadGame");
+        TickBased.Logger.Logger.Log("Bootstrap: Data loaded success.", "BootstrapGame LoadGame");
         
         var sceneMgr = ServiceLocator.Get<IServiceSceneManager>();
         await sceneMgr.LoadSceneAddressableAsync(SceneManager.SceneType.LobbyScene);

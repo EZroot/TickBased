@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     
     public void MoveEntity(Vector2 direction, float speed)
     {
-            Logger.Log("Moving entity", "PlayerController");
+            TickBased.Logger.Logger.Log("Moving entity", "PlayerController");
             transform.Translate(direction * speed * Time.deltaTime);
     }
 

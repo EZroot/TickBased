@@ -7,7 +7,7 @@ public class EntityData
 {
     public string ID;
     public string IDHash;
-
+    
     public EntityData()
     {
         // if(_id != string.Empty)

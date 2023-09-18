@@ -68,7 +68,7 @@ namespace FearProj.ServiceLocator
             _currentActiveSceneInstance = await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
             if(OnSceneFinishedLoading != null)
             {
-                Logger.Log($"On scene finished loading {sceneName}");
+                TickBased.Logger.Logger.Log($"On scene finished loading {sceneName}");
                 OnSceneFinishedLoading(sceneType);
             }
         }

@@ -18,12 +18,12 @@ public class CreatureEntityData : EntityData
 
     public void SetCreatureSprites(CreatureSprites sprites)
     {
-        Logger.Log($"Setting sprites...", "CreatureEntityData");
+        TickBased.Logger.Logger.Log($"Setting sprites...", "CreatureEntityData");
         CreatureSprites = new CreatureSprites(sprites);
     }
     public void SetClientStats(ClientStats stats)
     {
-        Logger.Log($"From CreatueEntData: {stats.ClientId} {stats.Username}");
+        TickBased.Logger.Logger.Log($"From CreatueEntData: {stats.ClientId} {stats.Username}");
         ClientStats = new ClientStats(stats);
     }
 

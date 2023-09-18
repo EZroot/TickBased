@@ -20,9 +20,9 @@ namespace FearProj.ServiceLocator
             _entityDataDictionary = new Dictionary<Type, List<EntityData>>();
 
             var dataSettings = ServiceLocator.Get<IServiceGameManager>().GameSettings.DataSettings;
-            FileUtils.InitDirectories(dataSettings);
+            TickBased.Utils.FileUtils.InitDirectories(dataSettings);
 
-            Logger.Log("Data Manager Called!", "DataManager");
+            TickBased.Logger.Logger.Log("Data Manager Called!", "DataManager");
             //LoadAndProcessData().Forget();
         }
 
@@ -54,7 +54,7 @@ namespace FearProj.ServiceLocator
             {
                 // Get the type of the current ScriptableObject
                 var baseSOType = baseSO.GetType();
-                Logger.Log($"Loading {baseSOType}", "DataManager");
+                TickBased.Logger.Logger.Log($"Loading {baseSOType}", "DataManager");
 
                 // Check if the type is present in the dictionary, and execute the corresponding action
                 if (typeActions.TryGetValue(baseSOType, out Func<DataSO, UniTask> action))
@@ -64,7 +64,7 @@ namespace FearProj.ServiceLocator
                 else
                 {
                     // Handle the base class or any unknown types here
-                    Logger.Log("ProcessData: Found DataSO or unknown type", "DataManager");
+                    TickBased.Logger.Logger.Log("ProcessData: Found DataSO or unknown type", "DataManager");
                 }
             }
         }
@@ -75,7 +75,7 @@ namespace FearProj.ServiceLocator
             var entityData = playerSO.EntityData;
 
             //Initial Copy of data
-            var dataObj = DataUtils.DeepCopy(entityData);
+            var dataObj = TickBased.Utils.DataUtils.DeepCopy(entityData);
             //Check if saved data exists
             var fileName = dataObj.ID;
             var loadedData = await LoadDataFromJson<PlayerEntityData>(fileName);
@@ -86,7 +86,7 @@ namespace FearProj.ServiceLocator
 
             AddEntityDataToDictionary(dataObj.GetType(), dataObj);
             // Do something with the EntityDataA
-            Logger.Log("PlayerData_Processor: <color=green>Loaded</color>", "DataManager");
+            TickBased.Logger.Logger.Log("PlayerData_Processor: <color=green>Loaded</color>", "DataManager");
         }
 
         private async UniTask ObjectData_Processor(DataSO baseSO)
@@ -94,7 +94,7 @@ namespace FearProj.ServiceLocator
             var dataSO = (ObjectEntityDataSO)baseSO;
             var entityData = dataSO.EntityData;
 
-            var dataObj = DataUtils.DeepCopy(entityData);
+            var dataObj = TickBased.Utils.DataUtils.DeepCopy(entityData);
             //Check if saved data exists
             var fileName = dataObj.ID;
             var loadedData = await LoadDataFromJson<PlayerEntityData>(fileName);
@@ -104,7 +104,7 @@ namespace FearProj.ServiceLocator
 
             AddEntityDataToDictionary(dataObj.GetType(), dataObj);
             // Do something with the EntityDataB
-            Logger.Log("ObjectData_Processor: <color=green>Loaded</color>", "DataManager");
+            TickBased.Logger.Logger.Log("ObjectData_Processor: <color=green>Loaded</color>", "DataManager");
         }
 
         private async UniTask CreatureData_Processor(DataSO baseSO)
@@ -112,7 +112,7 @@ namespace FearProj.ServiceLocator
             var dataSO = (CreatureDataSO)baseSO;
             var entityData = dataSO.CreatureEntityData;
 
-            var dataObj = DataUtils.DeepCopy(entityData);
+            var dataObj = TickBased.Utils.DataUtils.DeepCopy(entityData);
             //Check if saved data exists
             var fileName = dataObj.ID;
             var loadedData = await LoadDataFromJson<CreatureEntityData>(fileName);
@@ -122,18 +122,18 @@ namespace FearProj.ServiceLocator
 
             AddEntityDataToDictionary(dataObj.GetType(), dataObj);
             // Do something with the EntityDataB
-            Logger.Log("CreatureData_Processor: <color=green>Loaded</color>", "DataManager");
+            TickBased.Logger.Logger.Log("CreatureData_Processor: <color=green>Loaded</color>", "DataManager");
         }
 
         public async UniTask SaveDataAsJson<T>(T data) where T : EntityData
         {
             var json = JsonUtility.ToJson(data);
-            await FileUtils.SaveFile(json, data.ID);
+            await TickBased.Utils.FileUtils.SaveFile(json, data.ID);
         }
 
         public async UniTask<T> LoadDataFromJson<T>(string fileName) where T : EntityData
         {
-            var data = await FileUtils.LoadFile<T>(fileName);
+            var data = await TickBased.Utils.FileUtils.LoadFile<T>(fileName);
             return data;
         }
 
@@ -142,12 +142,12 @@ namespace FearProj.ServiceLocator
         {
             if (_entityDataDictionary.TryGetValue(type, out List<EntityData> values))
             {
-                Logger.Log($"AddEntityDataToDictionary: Added {type} to existing Dictionary Data", "DataManager");
+                TickBased.Logger.Logger.Log($"AddEntityDataToDictionary: Added {type} to existing Dictionary Data", "DataManager");
                 values.Add(data);
             }
             else
             {
-                Logger.Log($"AddEntityDataToDictionary: Created {type} in Dictionary Data", "DataManager");
+                TickBased.Logger.Logger.Log($"AddEntityDataToDictionary: Created {type} in Dictionary Data", "DataManager");
                 _entityDataDictionary.Add(type, new List<EntityData>() { data }); // Add a new empty list for the ID
             }
         }
@@ -156,12 +156,12 @@ namespace FearProj.ServiceLocator
         {
             // Process the loaded DataSO object here
             // For example:
-            Logger.Log($"DataSO_OnLoad: addressable SO asset loaded {data.name}", "DataManager");
+            TickBased.Logger.Logger.Log($"DataSO_OnLoad: addressable SO asset loaded {data.name}", "DataManager");
         }
 
         public void TestFunc()
         {
-            Logger.Log("DataManager Tested and working", "DataManager");
+            TickBased.Logger.Logger.Log("DataManager Tested and working", "DataManager");
         }
 
     }

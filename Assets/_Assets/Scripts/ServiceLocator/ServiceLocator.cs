@@ -30,15 +30,15 @@ namespace FearProj.ServiceLocator
                 //monobehaviour
                 if (potentialObject != null)
                 {
-                    Logger.Log($"Registered (Monobehaviour)<color=green>{typeof(T)}</color> success!", "ServiceLocator");
+                    TickBased.Logger.Logger.Log($"Registered (Monobehaviour)<color=green>{typeof(T)}</color> success!", "ServiceLocator");
                     _registry[typeof(T)] = potentialObject;
                 }
                 return;
             }
-            Logger.Log($"Registered (Pure C#)<color=green>{typeof(T)}</color> success!", "ServiceLocator");
+            TickBased.Logger.Logger.Log($"Registered (Pure C#)<color=green>{typeof(T)}</color> success!", "ServiceLocator");
             var instance = Activator.CreateInstance(potentialService);
             _registry[typeof(T)] = instance;
-            //Logger.Log($"Service: Registered (Pure C# Class){typeof(T)} success!");
+            //TickBased.Logger.Logger.Log($"Service: Registered (Pure C# Class){typeof(T)} success!");
         }
 
         public static T Get<T>() where T : IService

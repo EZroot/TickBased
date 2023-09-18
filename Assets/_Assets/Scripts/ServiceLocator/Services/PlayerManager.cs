@@ -50,12 +50,12 @@ namespace FearProj.ServiceLocator
 
         public void TestFunc()
         {
-            Logger.Log("Player Manager called");
+            TickBased.Logger.Logger.Log("Player Manager called");
         }
 
         public void SetClientStats(int clientId, string username)
         {
-            Logger.Log($"[PlayerManager] SetClientStats -> ClientID {clientId} Username {username}");
+            TickBased.Logger.Logger.Log($"[PlayerManager] SetClientStats -> ClientID {clientId} Username {username}");
             _clientStats = new ClientStats(clientId, username);
             if(OnPlayerClientStatsChanged != null)
                 OnPlayerClientStatsChanged(_clientStats);

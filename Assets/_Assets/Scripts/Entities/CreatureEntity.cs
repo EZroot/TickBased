@@ -1,8 +1,6 @@
 using System;
 using FearProj.ServiceLocator;
 using FishNet.Object;
-using FishNet.Object.Synchronizing;
-using Sirenix.OdinInspector;
 using TickBased.Scripts.Commands;
 using UnityEngine;
 public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEntityData
@@ -14,6 +12,7 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
 
     public Action OnGhostEntityMovement;
     public CreatureEntityData EntityData => _entityData;
+    public ITileObject TileObject => this;
     public string UniqueID => EntityData.UniqueID;
     public bool IsInitialized => EntityData != null || EntityData.UniqueID != String.Empty;
 
@@ -21,27 +20,28 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
     public Transform GhostTransform => _ghostTransform;
     
     //Current location for updating movement commands
-    private Vector2 _currentGridPosition;
-    private Vector2 _ghostGridPosition;
+    private GridManager.GridCoordinate _ghostGridPosition;
     protected GameObject[] _objectsInRangeCreature;
     protected GameObject[] _objectsInRangeGhost;
     protected float _collisionRadius = 2f;
 
     public virtual void Start()
     {
-        Logger.Log("Start called", "CreatureEntity");
+        TickBased.Logger.Logger.Log("Start called", "CreatureEntity");
 
         //will probably need to sync this initial position or something
-        _currentGridPosition = _creatureTransform.position;
-        _ghostGridPosition = _currentGridPosition;
+        SetGridCoordinates((int)_creatureTransform.position.x, (int) _creatureTransform.position.y);
+        _ghostGridPosition = new GridManager.GridCoordinate(GridCoordinates.X,GridCoordinates.Y);
         AddCreatureToManager();
     }
     
     public override void Initialize()
     {
-        Logger.Log("Creature Entity Initialized", "CreatureEntity");
+        TickBased.Logger.Logger.Log("Creature Entity Initialized", "CreatureEntity");
         base.Initialize();
         GenerateUniqueID();
+        var lightManager = ServiceLocator.Get<IServiceLightManager>();
+        lightManager.AddRadialLight(UniqueID,GridCoordinates.X,GridCoordinates.Y, 6, Color.clear);
     }
 
     protected void AddCreatureToManager()
@@ -53,7 +53,7 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
     protected void GenerateUniqueID()
     {
         var id = Guid.NewGuid().ToString();
-        Logger.Log($"Generating unique ID {id}", "CreatureEntity");
+        TickBased.Logger.Logger.Log($"Generating unique ID {id}", "CreatureEntity");
         EntityData.UniqueID = id;
     }
 
@@ -79,24 +79,31 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
         var canIssueCommand = tickManager.CheckIfCreatureCanIssueCommandThisTick(uniqueId);
         if (canIssueCommand == false)
             return;
-        
-        _currentGridPosition += direction;
-        var moveCommand = new MoveCommand(_creatureTransform, _currentGridPosition);
+
+        var gridManager = ServiceLocator.Get<IServiceGridManager>();
+        var xx = (int)(GridCoordinates.X + direction.x);
+        var yy = (int)(GridCoordinates.Y + direction.y);
+        SetGridCoordinates(xx, yy);
+        var worldPosition = GridCoordinates * gridManager.TileSize;
+        var moveCommand = new MoveCommand(this, worldPosition );
 
         tickManager.QueueCommand(uniqueId, moveCommand, tickManager.CurrentTick); //might need to send the current tick to make sure its synced..
 
         if (useGhostPrediction)
         {
             // New code for the ghost character
-            _ghostGridPosition += direction;
-            UpdateGhostPosition(_ghostGridPosition);
+            var gx = (int)(_ghostGridPosition.X + direction.x);
+            var gy = (int)(_ghostGridPosition.Y + direction.y);
+            _ghostGridPosition = new GridManager.GridCoordinate(gx,gy);
+            var ghostPos = _ghostGridPosition * gridManager.TileSize;
+            UpdateGhostPosition(ghostPos);
         }
     }
     
-    void UpdateGhostPosition(Vector2 newPosition)
+    void UpdateGhostPosition(GridManager.GridCoordinate newPosition)
     {
         // Update the transform or the position of the ghost character based on the new grid position
-        _ghostTransform.position = _ghostGridPosition;
+        _ghostTransform.position = new Vector2(newPosition.X,newPosition.Y);
         OnGhostEntityMovement?.Invoke();
     }
 
@@ -136,7 +143,7 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
 
     protected void UpdateSpriteAddressables(CreatureEntityData data)
     {
-        Logger.Log("Loading wearable addressables", "CreatureEntity");
+        TickBased.Logger.Logger.Log("Loading wearable addressables", "CreatureEntity");
         _entityWearables.SetWearableAddressable(EntityWearables.WearableType.Sprite, data.CreatureSprites.SpriteAddressableKey);
         _ghostEntityWearables.SetWearableAddressable(EntityWearables.WearableType.Sprite, data.CreatureSprites.SpriteAddressableKey);
     }
@@ -153,7 +160,7 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
         for (int i = 0; i < hits.Length; i++)
         {
             // Do something with each object that was hit
-            Logger.Log("Hit: " + hits[i].gameObject.name, "PlayerEntity:OnTick_Collision");
+            TickBased.Logger.Logger.Log("Hit: " + hits[i].gameObject.name, "PlayerEntity:OnTick_Collision");
             _objectsInRangeCreature[i] = hits[i].gameObject;
         }
     }
@@ -170,7 +177,7 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
         for (int i = 0; i < hits.Length; i++)
         {
             // Do something with each object that was hit
-            Logger.Log("Hit: " + hits[i].gameObject.name, "PlayerEntity:OnTick_Collision");
+            TickBased.Logger.Logger.Log("Hit: " + hits[i].gameObject.name, "PlayerEntity:OnTick_Collision");
             _objectsInRangeGhost[i] = hits[i].gameObject;
         }
     }
@@ -184,7 +191,7 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
     [ObserversRpc]
     public void RPCSendCommandAttackClient(string targetCreatureUniqueID, CreatureEntityData.AttackType attackType, string limbName, int damage)
     {
-        Logger.Log($"AttackClient {targetCreatureUniqueID}", "PlayerEntity:RPCSendCommandAttackClient");
+        TickBased.Logger.Logger.Log($"AttackClient {targetCreatureUniqueID}", "PlayerEntity:RPCSendCommandAttackClient");
         AttackCreature(targetCreatureUniqueID,attackType,limbName,damage);
     }
     
@@ -197,7 +204,7 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
     [ObserversRpc]
     public void RPCSendCommandWrestleClient(string targetCreatureUniqueID, CreatureEntityData.WrestleType wrestleType, string limbName, int damage)
     {
-        Logger.Log($"WrestleClient {targetCreatureUniqueID}", "PlayerEntity:RPCSendCommandWrestleClient");
+        TickBased.Logger.Logger.Log($"WrestleClient {targetCreatureUniqueID}", "PlayerEntity:RPCSendCommandWrestleClient");
         WrestleCreature(targetCreatureUniqueID,wrestleType,limbName,damage);
     }
 }
