@@ -5,7 +5,6 @@ using UnityEngine;
 [System.Serializable]
 public class CreatureEntityData : EntityData
 {
-    public string UniqueID;
     public bool IsPlayer;
     public ClientStats ClientStats;
     public CreatureStats CreatureStats;

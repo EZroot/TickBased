@@ -2,10 +2,10 @@
 <ConfigurationData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Loaded>true</Loaded>
   <PrefabGenerator>
-    <Enabled>false</Enabled>
+    <Enabled>true</Enabled>
     <LogToConsole>true</LogToConsole>
-    <FullRebuild>false</FullRebuild>
-    <SaveChanges>false</SaveChanges>
+    <FullRebuild>true</FullRebuild>
+    <SaveChanges>true</SaveChanges>
     <DefaultPrefabObjectsPath>Assets\_Assets\DefaultPrefabObjects.asset</DefaultPrefabObjectsPath>
     <SearchScope>1</SearchScope>
     <ExcludedFolders />

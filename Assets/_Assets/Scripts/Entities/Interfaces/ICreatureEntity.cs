@@ -10,8 +10,8 @@
         ITileObject TileObject { get; }
         Transform CreatureTransform { get; }
         void SetDirection(Quaternion dir);
-
+        void SetStartPosition(GridManager.GridCoordinate coordinate);
         void HighlightCreature();
         void UnHighlightCreature();
-
+        
     }

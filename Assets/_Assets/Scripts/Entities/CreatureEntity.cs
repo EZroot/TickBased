@@ -39,7 +39,6 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
     {
         TickBased.Logger.Logger.Log("Creature Entity Initialized", "CreatureEntity");
         base.Initialize();
-        GenerateUniqueID();
         var lightManager = ServiceLocator.Get<IServiceLightManager>();
         lightManager.AddRadialLight(UniqueID,GridCoordinates.X,GridCoordinates.Y, 6, Color.clear);
     }
@@ -50,16 +49,18 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
         creatureManager.AddCreature(this);
     }
     
-    protected void GenerateUniqueID()
-    {
-        var id = Guid.NewGuid().ToString();
-        TickBased.Logger.Logger.Log($"Generating unique ID {id}", "CreatureEntity");
-        EntityData.UniqueID = id;
-    }
+
 
     public void SetDirection(Quaternion rotation)
     {
         _creatureTransform.rotation = rotation;
+    }
+
+    public void SetStartPosition(GridManager.GridCoordinate coordinate)
+    {
+        var targ = new Vector2(coordinate.X, coordinate.Y);
+        CreatureTransform.position  = targ;
+        TileObject.SetGridCoordinates(coordinate.X,coordinate.Y);
     }
 
     public void HighlightCreature()

@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: bcacf555161c0ad44abb2691039902ed
   m_currentHash:
     serializedVersion: 2
-    Hash: 8c31156cc90c92f4480bd21899ab15f0
+    Hash: c3d91ab6c04aa99b45b7413785d2b6e4
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_BundleLocalCatalog: 0
@@ -47,6 +47,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c5f83c637e7436943881e87fb528eddd, type: 2}
   - {fileID: 11400000, guid: 286dc6d254c7c7243ac352e74ff06ed0, type: 2}
   - {fileID: 11400000, guid: ce29c80e7ebb82448831f52d9f86b7b9, type: 2}
+  - {fileID: 11400000, guid: b61e686b8645e0649acb5ef43ff5c157, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -89,6 +90,17 @@ MonoBehaviour:
     m_LabelNames:
     - default
     - entitydataso
+    - prefab_player
+    - prefab_enemy
+    - prefab_npc
+    - prefab_item
+    - prefab_wall
+    - prefab_interactive
+    - prefab_trap
+    - prefab_decoration
+    - prefab_effect
+    - prefab_resource
+    - prefab_object
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: daa97834ce0a25e4faf9fa3d8f32b91f, type: 2}

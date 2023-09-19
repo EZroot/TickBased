@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: EntityPrefabs
+  m_EditorClassIdentifier: 
+  m_GroupName: EntityPrefabs
+  m_Data:
+    m_SerializedData: []
+  m_GUID: ae8bc99989c43294bb55c7d6b1d104ff
+  m_SerializeEntries:
+  - m_GUID: ab9efc9711d028c48a88497ba4467404
+    m_Address: Assets/_Assets/NetworkedPrefabs/PlayerEntity.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab_player
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0655143c5d8c5b344ae47605a80831e7
+    m_Address: Assets/_Assets/NetworkedPrefabs/ObjectEntity.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab_object
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 4ec08875c62f4e74cab76aa9ffc03375, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: de5048dc1ea950246aad48103597c6ea, type: 2}
+    - {fileID: 11400000, guid: 2a8ea018a454f5e4abdec59bce417573, type: 2}

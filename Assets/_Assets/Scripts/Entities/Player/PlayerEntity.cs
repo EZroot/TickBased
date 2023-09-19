@@ -178,6 +178,7 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
 
         if (base.IsOwner)
         {
+
             var uiManager = ServiceLocator.Get<IServiceUIManager>();
 
             //clear interaction choices

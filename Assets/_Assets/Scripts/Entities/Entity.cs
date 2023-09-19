@@ -1,3 +1,4 @@
+using System;
 using FishNet.Object;
 using FearProj.ServiceLocator;
 using UnityEngine;
@@ -21,12 +22,32 @@ public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityD
             {
                 if (tmp.ID == _entityDataKey)
                 {
-                    TickBased.Logger.Logger.Log($"Entity Data: <color=green>{tmp.GetType()}</color> assigned to <color=green>{this.GetType()}</color>");
+                    TickBased.Logger.Logger.Log($"Entity Data: <color=green>[{_entityDataKey}]{tmp.GetType()}</color> assigned to <color=green>{this.GetType()}</color>");
                     SetEntityData(tmp);
                     break;
                 }
             }
         }
+        GenerateUniqueID();
+    }
+    
+    public virtual void Initialize(string entityDataKey)
+    {
+        var dataMngr = ServiceLocator.Get<IServiceDataManager>();
+        var data = dataMngr.GetEntityData<TData>(typeof(TData));
+        if (data.Count > 0)
+        {
+            foreach (var tmp in data)
+            {
+                if (tmp.ID == entityDataKey)
+                {
+                    TickBased.Logger.Logger.Log($"Entity Data: <color=green>[{entityDataKey}]{tmp.GetType()}</color> assigned to <color=green>{this.GetType()}</color>");
+                    SetEntityData(tmp);
+                    break;
+                }
+            }
+        }
+        GenerateUniqueID();
     }
 
     public virtual void SetEntityData(TData data)
@@ -64,5 +85,27 @@ public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityD
         _gridCoordinates = new GridManager.GridCoordinate(x, y);
         gridManager.SetTileData(_gridCoordinates.X,_gridCoordinates.Y, new GridManager.Tile(GridManager.TileState.Object, this));
 
+    }
+    
+    protected void GenerateUniqueID()
+    {
+        var id = Guid.NewGuid().ToString();
+        TickBased.Logger.Logger.Log($"Generating unique ID {id}", "CreatureEntity");
+        EntityData.UniqueID = id;
+    }
+    
+    [ServerRpc(RequireOwnership =  false)]
+    public void RPCSetEntityDataKeyServer(string dataKey)
+    {
+        TickBased.Logger.Logger.Log("Setting asdasd Data", "RPCSetEntityDataClient");
+
+        RPCSetEntityDataKeyClient(dataKey);
+    }
+
+    [ObserversRpc(BufferLast = true)]
+    void RPCSetEntityDataKeyClient(string dataKey)
+    {
+        TickBased.Logger.Logger.Log("Setting asdasd client Data", "RPCSetEntityDataClient");
+        Initialize(dataKey);
     }
 }

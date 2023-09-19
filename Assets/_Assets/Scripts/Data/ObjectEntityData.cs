@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class ObjectEntityData : EntityData
+public class ObjectEntityData : CreatureEntityData
 {
+    public ObjectEntityData() : base()
+    {
+
+    }
 }

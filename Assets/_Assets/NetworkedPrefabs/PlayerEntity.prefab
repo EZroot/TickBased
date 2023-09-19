@@ -342,6 +342,7 @@ GameObject:
   - component: {fileID: 8399575382468513345}
   - component: {fileID: 6088649063544043170}
   - component: {fileID: 619928633601238556}
+  - component: {fileID: 3410735192846541501}
   - component: {fileID: 6056206215942693030}
   - component: {fileID: 1590043994149602296}
   m_Layer: 0
@@ -438,9 +439,21 @@ MonoBehaviour:
   _componentIndexCache: 2
   _addedNetworkObject: {fileID: 1590043994149602296}
   _networkObjectCache: {fileID: 1590043994149602296}
-  _gridSize: 64
-  _tileSize: 2
-  _seed: 6969
+--- !u!114 &3410735192846541501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3419350767850265343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce40a25eb8df46a3b256d67052343b9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 1590043994149602296}
+  _networkObjectCache: {fileID: 0}
 --- !u!114 &6056206215942693030
 MonoBehaviour:
   m_ObjectHideFlags: 0

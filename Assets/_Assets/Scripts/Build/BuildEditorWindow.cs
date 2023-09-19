@@ -64,18 +64,20 @@ public class BuildEditorWindow : EditorWindow
 
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = scenes;
-        buildPlayerOptions.locationPathName = Path.Combine(buildFolderPath, "Game.exe");
+        buildPlayerOptions.locationPathName = Path.Combine(buildFolderPath, exeName);
         buildPlayerOptions.target = buildTarget;
 
         buildPlayerOptions.options = developmentBuild ? BuildOptions.Development : BuildOptions.None;
 
         BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
-        BuildSummary summary = report.summary;
+        CopyFiles(report);
 
+        BuildSummary summary = report.summary;
+        
         if (summary.result == BuildResult.Succeeded)
         {
             Debug.Log("Build succeeded: " + summary.totalSize + " bytes");
-
+            
             if (autoOpenFolder)
             {
                 string folderPath = System.IO.Path.GetDirectoryName(buildPath);
@@ -86,6 +88,40 @@ public class BuildEditorWindow : EditorWindow
         {
             Debug.LogError("Build failed");
         }
+    }
+
+    void CopyFiles(BuildReport report)
+    {
+        string buildPathOutput = report.summary.outputPath;
+        string buildPath = Path.GetDirectoryName(buildPathOutput);
+        // buildPath += "/" + exeName;
+        // buildPath = buildPath.Substring(0, buildPath.Length - 4);
+        // buildPath += "_Data";
+        
+        var dataSettingsPath = "Assets/_Assets/SOSettings/DataSettings.asset";
+
+        DataSettingsScriptableObject dataSettings = AssetDatabase.LoadAssetAtPath<DataSettingsScriptableObject>(dataSettingsPath);
+        
+        string sourcePath = Application.dataPath + "/.." + dataSettings.LocalDevAssetsToCopy;
+        string destinationPath = buildPath + dataSettings.AssetPath;
+        Debug.Log($"SOURCE {sourcePath} DEST {destinationPath}");
+
+        // Ensure the destination folder exists
+        if (!Directory.Exists(destinationPath))
+        {
+            Directory.CreateDirectory(destinationPath);
+        }
+
+        // Copy files
+        foreach (string file in Directory.GetFiles(sourcePath))
+        {
+            string fileName = Path.GetFileName(file);
+            Debug.Log($"Copying {fileName} ");
+
+            File.Copy(file, Path.Combine(destinationPath, fileName), overwrite: true);
+        }
+
+        Debug.Log($"Files copied to {destinationPath}");
     }
 }
 #endif

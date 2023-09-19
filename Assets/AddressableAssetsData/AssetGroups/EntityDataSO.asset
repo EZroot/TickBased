@@ -23,6 +23,18 @@ MonoBehaviour:
     m_SerializedLabels:
     - entitydataso
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2b49c3597c794ec41a707eea51cbce88
+    m_Address: Assets/_Assets/SOSettings/AddressableEntityData/ObjectEntityData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - entitydataso
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39318f00abad4ad4aa407166477b78bd
+    m_Address: Assets/_Assets/SOSettings/AddressableEntityData/ObjectEntityData 1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - entitydataso
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 4ec08875c62f4e74cab76aa9ffc03375, type: 2}
   m_SchemaSet:

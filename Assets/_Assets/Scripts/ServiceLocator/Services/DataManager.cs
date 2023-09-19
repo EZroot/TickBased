@@ -83,7 +83,8 @@ namespace FearProj.ServiceLocator
             //No saved data exists
             if (loadedData == null)
                 await SaveDataAsJson(dataObj);
-
+            else
+                dataObj = loadedData;
             AddEntityDataToDictionary(dataObj.GetType(), dataObj);
             // Do something with the EntityDataA
             TickBased.Logger.Logger.Log("PlayerData_Processor: <color=green>Loaded</color>", "DataManager");
@@ -97,10 +98,13 @@ namespace FearProj.ServiceLocator
             var dataObj = TickBased.Utils.DataUtils.DeepCopy(entityData);
             //Check if saved data exists
             var fileName = dataObj.ID;
-            var loadedData = await LoadDataFromJson<PlayerEntityData>(fileName);
+            var loadedData = await LoadDataFromJson<ObjectEntityData>(fileName);
+
             //No saved data exists
             if (loadedData == null)
                 await SaveDataAsJson(dataObj);
+            else
+                dataObj = loadedData;
 
             AddEntityDataToDictionary(dataObj.GetType(), dataObj);
             // Do something with the EntityDataB
@@ -116,10 +120,13 @@ namespace FearProj.ServiceLocator
             //Check if saved data exists
             var fileName = dataObj.ID;
             var loadedData = await LoadDataFromJson<CreatureEntityData>(fileName);
+
             //No saved data exists
             if (loadedData == null)
                 await SaveDataAsJson(dataObj);
-
+            else
+                dataObj = loadedData;
+            
             AddEntityDataToDictionary(dataObj.GetType(), dataObj);
             // Do something with the EntityDataB
             TickBased.Logger.Logger.Log("CreatureData_Processor: <color=green>Loaded</color>", "DataManager");
