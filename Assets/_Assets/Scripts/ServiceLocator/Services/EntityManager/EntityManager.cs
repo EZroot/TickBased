@@ -24,9 +24,10 @@ public class EntityManager : MonoBehaviour, IServiceEntityManager
             var content = await Addressables.LoadAssetAsync<GameObject>(addressableLabel);
             if (content != null)
             {
-                var obj = Instantiate(content, new Vector2(gridCoordinate.X,gridCoordinate.Y),Quaternion.identity);
+                var gridManager = ServiceLocator.Get<IServiceGridManager>();
+                var cordpos = gridManager.GridToWorld(gridCoordinate);
+                var obj = Instantiate(content, cordpos,Quaternion.identity);
                 entity = obj.GetComponent<Entity<T>>();
-                Debug.Log($"EntityManager -> entity {entity!=null}");
                 var networkManager = ServiceLocator.Get<IServiceNetworkManager>();
                 networkManager.FishnetManager.ServerManager.Spawn(obj, networkManager.FishnetManager.ClientManager.Connection);
             }

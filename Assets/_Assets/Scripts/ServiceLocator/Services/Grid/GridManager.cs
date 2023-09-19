@@ -504,38 +504,38 @@ namespace FearProj.ServiceLocator
             return new Vector2(worldX, worldY);
         }
 
-        void OnDrawGizmos()
-        {
-            var gridWidth = _gridData.Width;
-            var gridHeight = _gridData.Height;
-            Gizmos.color = Color.gray;
-            // for (int x = 0; x <= _gridData.Width; x++)
-            // {
-            //     Gizmos.DrawLine(new Vector3(x * TileSize, 0, 0), new Vector3(x * TileSize, gridHeight, 0));
-            // }
-            //
-            // for (int y = 0; y <= _gridData.Height; y++)
-            // {
-            //     Gizmos.DrawLine(new Vector3(0, y * TileSize, 0), new Vector3(gridWidth, y * TileSize, 0));
-            // }
-
-            Gizmos.color = Color.black;
-            for (int x = 0; x < gridWidth; x++)
-            {
-                for (int y = 0; y < gridHeight; y++)
-                {
-                    Gizmos.DrawWireCube(new Vector3(x * TileSize, y * TileSize, 0), new Vector3(TileSize, TileSize, 0));
-                }
-            }
-
-            Camera camera = Camera.allCameras[0]; // Or your specific camera
-            GridCoordinate coord = GetGridPositionFromMouse(camera);
-
-            Vector3 worldPosition = new Vector3(coord.X * _tileSize, coord.Y * _tileSize, 0);
-
-            Gizmos.color = Color.red; // Set the color
-            Gizmos.DrawCube(worldPosition, new Vector3(_tileSize, _tileSize, 1)); // Draw a cube at the grid position
-        }
+        // void OnDrawGizmos()
+        // {
+        //     var gridWidth = _gridData.Width;
+        //     var gridHeight = _gridData.Height;
+        //     Gizmos.color = Color.gray;
+        //     // for (int x = 0; x <= _gridData.Width; x++)
+        //     // {
+        //     //     Gizmos.DrawLine(new Vector3(x * TileSize, 0, 0), new Vector3(x * TileSize, gridHeight, 0));
+        //     // }
+        //     //
+        //     // for (int y = 0; y <= _gridData.Height; y++)
+        //     // {
+        //     //     Gizmos.DrawLine(new Vector3(0, y * TileSize, 0), new Vector3(gridWidth, y * TileSize, 0));
+        //     // }
+        //
+        //     Gizmos.color = Color.black;
+        //     for (int x = 0; x < gridWidth; x++)
+        //     {
+        //         for (int y = 0; y < gridHeight; y++)
+        //         {
+        //             Gizmos.DrawWireCube(new Vector3(x * TileSize, y * TileSize, 0), new Vector3(TileSize, TileSize, 0));
+        //         }
+        //     }
+        //
+        //     Camera camera = Camera.allCameras[0]; // Or your specific camera
+        //     GridCoordinate coord = GetGridPositionFromMouse(camera);
+        //
+        //     Vector3 worldPosition = new Vector3(coord.X * _tileSize, coord.Y * _tileSize, 0);
+        //
+        //     Gizmos.color = Color.red; // Set the color
+        //     Gizmos.DrawCube(worldPosition, new Vector3(_tileSize, _tileSize, 1)); // Draw a cube at the grid position
+        // }
 
         [System.Serializable]
         public struct GridData

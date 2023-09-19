@@ -19,8 +19,8 @@ namespace TickBased.Utils
 
         static private void CopyLocalFilesFromDirectionTo(string sourcePath, string destinationPath)
         {
-            sourcePath = Application.dataPath + "/.." + sourcePath;
-            destinationPath = Application.dataPath + "/.." + destinationPath;
+            sourcePath = Application.dataPath  + sourcePath;
+            destinationPath = Application.dataPath  + destinationPath;
             Logger.Logger.Log($"Copying {sourcePath} -> {destinationPath}","FileUtils");
             foreach (string file in Directory.GetFiles(sourcePath))
             {
@@ -31,7 +31,7 @@ namespace TickBased.Utils
         
         public static void CreateDirectoriesIfNoneExist(string path)
         {
-            var newPath = Application.dataPath + "/.." + path;
+            var newPath = Application.dataPath  + path;
             TickBased.Logger.Logger.Log("Persistent Data Path: " + newPath, "FileUtils");
             if (!Directory.Exists(newPath))
             {
@@ -46,7 +46,7 @@ namespace TickBased.Utils
         
         static private void CreateLocalProjectDirectory(string path)
         {
-            var newPath = Application.dataPath + "/.." + path;
+            var newPath = Application.dataPath  + path;
             TickBased.Logger.Logger.Log("Persistent Data Path: " + newPath, "FileUtils");
             if (!Directory.Exists(newPath))
             {
@@ -64,7 +64,7 @@ namespace TickBased.Utils
             var mngr = ServiceLocator.Get<IServiceGameManager>();
             var dataPath = mngr.GameSettings.DataSettings.DataPath;
             dataPath = dataPath + fileName + ".json";
-            var fullPath = Application.dataPath + "/.." + dataPath;
+            var fullPath = Application.dataPath  + dataPath;
 
             using (FileStream fileStream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None,
                        bufferSize: 4096, useAsync: true))
@@ -83,7 +83,7 @@ namespace TickBased.Utils
             var mngr = ServiceLocator.Get<IServiceGameManager>();
             var dataPath = mngr.GameSettings.DataSettings.DataPath;
             dataPath = dataPath + fileName + ".json";
-            var fullPath = Application.dataPath + "/.." + dataPath;
+            var fullPath = Application.dataPath  + dataPath;
 
             T loadedData = default(T);
             if (File.Exists(fullPath))
@@ -104,7 +104,7 @@ namespace TickBased.Utils
         {
             var mngr = ServiceLocator.Get<IServiceGameManager>();
             var assetPath = mngr.GameSettings.DataSettings.AssetPath;
-            var fullPath = Application.dataPath + "/.." + assetPath + fileName;
+            var fullPath = Application.dataPath  + assetPath + fileName;
 
             if (File.Exists(fullPath))
             {
@@ -140,7 +140,7 @@ namespace TickBased.Utils
         
         public static string[] GetAllFilesWithExtension(string directoryPath, string extension)
         {
-            directoryPath = Application.dataPath + "/.." + directoryPath;
+            directoryPath = Application.dataPath  + directoryPath;
             Logger.Logger.Log($"Trying path: {directoryPath}", "FileUtils");
 
             if (Directory.Exists(directoryPath))
@@ -168,7 +168,7 @@ namespace TickBased.Utils
         {
             var mngr = ServiceLocator.Get<IServiceGameManager>();
             var dataPath = mngr.GameSettings.DataSettings.AssetPath;
-            var fullPath = Application.dataPath + "/.." + dataPath + fileName;
+            var fullPath = Application.dataPath  + dataPath + fileName;
 
             if (File.Exists(fullPath))
             {
@@ -187,7 +187,7 @@ namespace TickBased.Utils
         {
             var mngr = ServiceLocator.Get<IServiceGameManager>();
             var assetPath = mngr.GameSettings.DataSettings.AssetPath;
-            var fullPath = Application.dataPath + "/.." + assetPath + fileName;
+            var fullPath = Application.dataPath  + assetPath + fileName;
 
             byte[] bytes = texture.EncodeToPNG();
             await File.WriteAllBytesAsync(fullPath, bytes);
@@ -208,7 +208,7 @@ namespace TickBased.Utils
         {
             var mngr = ServiceLocator.Get<IServiceGameManager>();
             var dataPath = mngr.GameSettings.DataSettings.AssetPath;
-            var fullPath = Application.dataPath + "/.." + dataPath + fileName;
+            var fullPath = Application.dataPath  + dataPath + fileName;
 
             await File.WriteAllBytesAsync(fullPath, data);
 

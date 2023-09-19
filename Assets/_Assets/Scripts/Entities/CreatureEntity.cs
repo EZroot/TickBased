@@ -73,7 +73,7 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
         _entityWearables.UnHighlightSprite();
     }
 
-    protected void SetMovement(Vector2 direction, bool useGhostPrediction = true)
+    protected void SetMovement(GridManager.GridCoordinate newPosition, bool useGhostPrediction = true)
     {
         var tickManager = ServiceLocator.Get<IServiceTickManager>();
         var uniqueId = EntityData.UniqueID;
@@ -82,8 +82,8 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
             return;
 
         var gridManager = ServiceLocator.Get<IServiceGridManager>();
-        var xx = (int)(GridCoordinates.X + direction.x);
-        var yy = (int)(GridCoordinates.Y + direction.y);
+        var xx = (int)(newPosition.X);
+        var yy = (int)(newPosition.Y);
         SetGridCoordinates(xx, yy);
         var worldPosition = GridCoordinates * gridManager.TileSize;
         var moveCommand = new MoveCommand(this, worldPosition );
@@ -93,8 +93,8 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
         if (useGhostPrediction)
         {
             // New code for the ghost character
-            var gx = (int)(_ghostGridPosition.X + direction.x);
-            var gy = (int)(_ghostGridPosition.Y + direction.y);
+            var gx = (int)(newPosition.X);
+            var gy = (int)(newPosition.Y);
             _ghostGridPosition = new GridManager.GridCoordinate(gx,gy);
             var ghostPos = _ghostGridPosition * gridManager.TileSize;
             UpdateGhostPosition(ghostPos);

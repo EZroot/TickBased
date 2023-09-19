@@ -14,7 +14,21 @@ public class PlayerEntityController : NetworkBehaviour
         {
             if (Input.GetKeyDown(KeyCode.P))
             {
-                RPCLoadEntityServer(EntityType.Object, new GridManager.GridCoordinate(3,3),"dev_object2");
+                for(int i = 0; i < 20; i++)
+                {
+                    for (int j = 0; j < 20; j++)
+                    {
+                        RPCLoadEntityServer(EntityType.Object, new GridManager.GridCoordinate(i,j),"dev_object2");
+                    }
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                RPCLoadEntityServer(EntityType.Object, new GridManager.GridCoordinate(0,0),"dev_object2");
+            }
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                RPCLoadEntityServer(EntityType.Object, new GridManager.GridCoordinate(3,0),"dev_object2");
             }
         }
     }
@@ -32,18 +46,13 @@ public class PlayerEntityController : NetworkBehaviour
         var entityManager = ServiceLocator.Get<IServiceEntityManager>();
         var entityTask = entityManager.LoadEntity<ObjectEntityData>(entityType, coordinates);
         Entity<ObjectEntityData> result = null;
+        yield return null;
 
         yield return UniTask.ToCoroutine(async () =>
         {
             result = await entityTask;
         });
-        Debug.Log($"Spawned result {result!=null}");
+        yield return null;
         result.RPCSetEntityDataKeyServer(dataKey);
-    }
-    
-    [ObserversRpc]
-    void RPCLoadEntityClient(EntityType entityType, GridManager.GridCoordinate coordinates)
-    {
-    
     }
 }

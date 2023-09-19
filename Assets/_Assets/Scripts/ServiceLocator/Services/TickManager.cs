@@ -59,14 +59,14 @@ namespace FearProj.ServiceLocator
 
         public void QueueCommand(string creatureUniqueID, ICommand command, int tickToExecute)
         {
-//            TickBased.Logger.Logger.Log($"QueueCommand: {_commandQueue.Count} ", "TickManager");
+           TickBased.Logger.Logger.Log($"QueueCommand: {_commandQueue.Count} ", "TickManager");
             if(_commandQueue.ContainsKey(_currentTick))
                 TickBased.Logger.Logger.Log($"QueueCommand: CommandQueue: {_commandQueue[_currentTick].Count}", "TickManager");
 
             if (!_commandQueue.ContainsKey(tickToExecute))
             {
                 _commandQueue[tickToExecute] = new Dictionary<string, List<ICommand>>();
-                //TickBased.Logger.Logger.Log($"CommandQueue: Creating dictionary at tick {tickToExecute} ", "TickManager");
+                TickBased.Logger.Logger.Log($"CommandQueue: Creating dictionary at tick {tickToExecute} ", "TickManager");
             }
 
             if (!_commandQueue[tickToExecute].ContainsKey(creatureUniqueID))
@@ -96,7 +96,7 @@ namespace FearProj.ServiceLocator
         {
             PreTick?.Invoke(); //collisions and other actions should happen after movement?
 
-            //TickBased.Logger.Logger.Log($"Manual Tick called {_currentTick} ", "TickManager");
+            TickBased.Logger.Logger.Log($"Manual Tick called {_currentTick} ", "TickManager");
             yield return ExecuteCommands();
             _currentTick++;
 

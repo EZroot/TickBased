@@ -12,7 +12,7 @@ namespace TickBased.Scripts.Commands
 
         public MoveCommand(ICreatureEntity creatureEntity, GridManager.GridCoordinate targetPosition)
         {
-//            TickBased.Logger.Logger.Log($"Movement Command Set {entityTransform.root.gameObject.name} {targetPosition}");
+            TickBased.Logger.Logger.Log($"Movement Command Set {creatureEntity.EntityData.ID} {targetPosition}");
             this._creatureEntity = creatureEntity;
             this.targetPosition = targetPosition;
         }

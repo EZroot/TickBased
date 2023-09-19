@@ -94,15 +94,15 @@ public class BuildEditorWindow : EditorWindow
     {
         string buildPathOutput = report.summary.outputPath;
         string buildPath = Path.GetDirectoryName(buildPathOutput);
-        // buildPath += "/" + exeName;
-        // buildPath = buildPath.Substring(0, buildPath.Length - 4);
-        // buildPath += "_Data";
+        buildPath += "/" + exeName;
+        buildPath = buildPath.Substring(0, buildPath.Length - 4);
+        buildPath += "_Data";
         
         var dataSettingsPath = "Assets/_Assets/SOSettings/DataSettings.asset";
 
         DataSettingsScriptableObject dataSettings = AssetDatabase.LoadAssetAtPath<DataSettingsScriptableObject>(dataSettingsPath);
         
-        string sourcePath = Application.dataPath + "/.." + dataSettings.LocalDevAssetsToCopy;
+        string sourcePath = Application.dataPath + dataSettings.LocalDevAssetsToCopy;
         string destinationPath = buildPath + dataSettings.AssetPath;
         Debug.Log($"SOURCE {sourcePath} DEST {destinationPath}");
 

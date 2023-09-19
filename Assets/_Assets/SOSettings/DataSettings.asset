@@ -15,4 +15,4 @@ MonoBehaviour:
   _addressableEntityDataSettingLabel: entitydataso
   dataPath: /TickBased_SavedGame/Data/
   assetPath: /TickBased_SavedGame/Raw/Assets/
-  localDevAssetsToCopy: /Assets/LocalDevAssetsToCopy/
+  localDevAssetsToCopy: /_Assets/LocalDevAssetsToCopy/

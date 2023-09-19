@@ -47,19 +47,24 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
                 {
                     if (Input.GetKey(KeyCode.D))
                     {
-                        RPCSendCommandMoveServer(Vector2.right, true);
+                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y);
+                        RPCSendCommandMoveServer(newPos, true);
                     }
                     else if (Input.GetKey(KeyCode.A))
                     {
-                        RPCSendCommandMoveServer(Vector2.left, true);
+                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y);
+                        RPCSendCommandMoveServer(newPos, true);
                     }
                     else if (Input.GetKey(KeyCode.W))
                     {
-                        RPCSendCommandMoveServer(Vector2.up, true);
+                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y + 1);
+                        RPCSendCommandMoveServer(newPos, true);                    
                     }
                     else if (Input.GetKey(KeyCode.S))
                     {
-                        RPCSendCommandMoveServer(Vector2.down, true);
+                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y - 1);
+                        RPCSendCommandMoveServer(newPos, true);
+                        
                     }
                     _inputTimer = 0f;
                 }
@@ -68,20 +73,20 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
             {
                 if (Input.GetKeyDown(KeyCode.D))
                 {
-                    RPCSendCommandMoveServer(Vector2.right, true);
-                }
+                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y);
+                    RPCSendCommandMoveServer(newPos, true);                }
                 else if (Input.GetKeyDown(KeyCode.A))
                 {
-                    RPCSendCommandMoveServer(Vector2.left, true);
-                }
+                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y);
+                    RPCSendCommandMoveServer(newPos, true);                }
                 else if (Input.GetKeyDown(KeyCode.W))
                 {
-                    RPCSendCommandMoveServer(Vector2.up, true);
-                }
+                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y + 1);
+                    RPCSendCommandMoveServer(newPos, true);                                    }
                 else if (Input.GetKeyDown(KeyCode.S))
                 {
-                    RPCSendCommandMoveServer(Vector2.down, true);
-                }
+                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y - 1);
+                    RPCSendCommandMoveServer(newPos, true);                }
             }
 
             if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -310,15 +315,15 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
     }
 
     [ServerRpc]
-    public void RPCSendCommandMoveServer(Vector2 dir, bool useGhostPrediction)
+    public void RPCSendCommandMoveServer(GridManager.GridCoordinate newPos, bool useGhostPrediction)
     {
-        RPCSendCommandMoveClient(dir,useGhostPrediction);
+        RPCSendCommandMoveClient(newPos,useGhostPrediction);
     }
 
     [ObserversRpc]
-    public void RPCSendCommandMoveClient(Vector2 dir,bool useGhostPrediction)
+    public void RPCSendCommandMoveClient(GridManager.GridCoordinate newPos,bool useGhostPrediction)
     {
-        SetMovement(dir, useGhostPrediction);
+        SetMovement(newPos, useGhostPrediction);
     }
 
     [ServerRpc]
