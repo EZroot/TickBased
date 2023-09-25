@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: bcacf555161c0ad44abb2691039902ed
   m_currentHash:
     serializedVersion: 2
-    Hash: c3d91ab6c04aa99b45b7413785d2b6e4
+    Hash: 654ee9a3a7d4bf487e89917bdc233cd3
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_BundleLocalCatalog: 0
@@ -66,9 +66,9 @@ MonoBehaviour:
       - m_Id: 2851d8bb1293df447a748050486083a9
         m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
       - m_Id: 279d7ace7345c344b998f255b4343b01
-        m_Value: ServerData/[BuildTarget]
+        m_Value: 'ServerData/[BuildTarget]'
       - m_Id: 63b94e85e309b864893a81ce2b2269f2
-        m_Value: http://[PrivateIpAddress]:[HostingServicePort]
+        m_Value: 'http://[PrivateIpAddress]:[HostingServicePort]'
     m_ProfileEntryNames:
     - m_Id: 94667bc4010dd894ea7623a201836c06
       m_Name: BuildTarget
@@ -101,6 +101,9 @@ MonoBehaviour:
     - prefab_effect
     - prefab_resource
     - prefab_object
+    - prefab_aggressive
+    - prefab_hostile
+    - prefab_neutral
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: daa97834ce0a25e4faf9fa3d8f32b91f, type: 2}

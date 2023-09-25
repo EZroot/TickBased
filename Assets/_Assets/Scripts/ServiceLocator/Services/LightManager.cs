@@ -32,8 +32,8 @@ namespace FearProj.ServiceLocator
             {
                 int randomX = UnityEngine.Random.Range(0, _gridWidth);
                 int randomY = UnityEngine.Random.Range(0, _gridHeight);
-                Color randomColor = new Color(UnityEngine.Random.value * 0.2f, UnityEngine.Random.value * 0.2f,
-                    UnityEngine.Random.value * 0.2f, 0f);
+                Color randomColor = Color.clear;//new Color(UnityEngine.Random.value * 0.2f, UnityEngine.Random.value * 0.2f,
+                    //UnityEngine.Random.value * 0.2f, 0f);
 
                 var playerManager = ServiceLocator.Get<IServiceCreatureManager>();
                 var player = playerManager.Player.TileObject;
@@ -95,6 +95,7 @@ namespace FearProj.ServiceLocator
                     _lightGridChunks.Add(chunkMesh);
                     
                     Vector3[] vertices = new Vector3[CHUNK_SIZE * CHUNK_SIZE * 4];
+                    Vector2[] uvs = new Vector2[CHUNK_SIZE * CHUNK_SIZE * 4];
                     int[] triangles = new int[CHUNK_SIZE * CHUNK_SIZE * 6];
                     Color[] colors = new Color[CHUNK_SIZE * CHUNK_SIZE * 4];
                     
@@ -109,7 +110,7 @@ namespace FearProj.ServiceLocator
                     {
                         for (int k = startY; k < endY; k++)
                         {
-                            TickBased.Utils.MeshUtils.CreateSquare(i, k, tileSize, vertices, triangles, colors, ref vertexIndex,
+                            TickBased.Utils.MeshUtils.CreateSquare(i, k, tileSize, vertices,uvs, triangles, colors, ref vertexIndex,
                                 ref triangleIndex);
                         }
                     }
@@ -149,7 +150,7 @@ namespace FearProj.ServiceLocator
                 {
                     if (x >= 0 && x < _gridWidth && y >= 0 && y < _gridHeight)
                     {
-                        _alphaAccumulator[x, y] = 1;
+                        _alphaAccumulator[x, y] = _backGroundColor.a;
                         _colorAccumulator[x, y] = _backGroundColor;
                     }
                 }
@@ -235,8 +236,8 @@ namespace FearProj.ServiceLocator
                             int shadowY = y;
                             while (shadowX >= 0 && shadowX < _gridWidth && shadowY >= 0 && shadowY < _gridHeight)
                             {
-                                _alphaAccumulator[shadowX, shadowY] = 1; // Set alpha to maximum (darkest)
-                                _colorAccumulator[shadowX, shadowY] = Color.black; // Set color to black
+                                _alphaAccumulator[shadowX, shadowY] = _backGroundColor.a; // Set alpha to maximum (darkest)
+                                _colorAccumulator[shadowX, shadowY] = _backGroundColor; // Set color to black
 
                                 int shadowStepX = (dx > 0) ? 1 : (dx < 0) ? -1 : 0;
                                 int shadowStepY = (dy > 0) ? 1 : (dy < 0) ? -1 : 0;

@@ -20,11 +20,11 @@ public class PlayerTickController : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+        var tickManager = ServiceLocator.Get<IServiceTickManager>();
 
         if (IsHost == false || IsOwner == false)
             return;
 
-        var tickManager = ServiceLocator.Get<IServiceTickManager>();
         tickManager.OnCommandReceived += OnTickManager_CommandRecieved;
         tickManager.PostTick += OnTick_ResetForceCommandTimer;
         _isInitialized = true;
@@ -35,10 +35,21 @@ public class PlayerTickController : NetworkBehaviour
         if (_isInitialized == false || IsHost == false || IsOwner == false)
             return;
 
+
+        //Sends commands from every player, forced by server / host
         _lastCommandCheckTime += Time.deltaTime;
         if (_lastCommandCheckTime >= _timeLimitForCommand)
         {
-            ForcePlayersToSendCommand();
+            var tickManager = ServiceLocator.Get<IServiceTickManager>();
+            if (tickManager.TickModeRealTime == TickManager.TickModeRealTimeType.ForcePlayerAction && tickManager.IsExecutingTick == false)
+            {
+                ForcePlayersToSendCommand();
+            }
+            
+            if (Input.GetKey(KeyCode.Space) && tickManager.IsExecutingTick == false)
+            {
+                ForcePlayersToSendCommand();
+            }
             _lastCommandCheckTime = 0;
         }
     }
@@ -66,7 +77,6 @@ public class PlayerTickController : NetworkBehaviour
         //make sure we have our players counted
         if (_playersCommandStatus.Keys.Count == creatureManager.AllPlayersInScene.Count)
         {
-            TickBased.Logger.Logger.Log($"All Player Command Status's have been recorded", "PlayerTickController");
 
             //check if all status's are true
             var allPlayersSentACommand = true;
@@ -75,12 +85,16 @@ public class PlayerTickController : NetworkBehaviour
                 if (!pair.Value) // If the value is false
                 {
                     allPlayersSentACommand = false;
+                    TickBased.Logger.Logger.Log($"Waiting for all player status...", "PlayerTickController");
+
                     break; // Exit loop as soon as one player has not sent a command
                 }
             }
  
             if (allPlayersSentACommand)
             {
+                TickBased.Logger.Logger.Log($"All Player Command Status's have been recorded", "PlayerTickController");
+
                 //has to be real time
                 if (tickManager.TickExecutionMode == TickManager.TickMode.RealTime)
                 {

@@ -32,6 +32,36 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9551bcb94a52e614ab51d2b6c52b0059
+    m_Address: wall
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9c50c928a9291e7428ca6a8c98537cd4
+    m_Address: zombie_old
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4b9e6e7075271554bb418d4f3808860a
+    m_Address: zombie_ugly
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 25af69b2a3d03a94189b776623b5578b
+    m_Address: zombie_farmer
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fcb19868549d87a49b5e7f0217598da6
+    m_Address: tree_redwood
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9758884c0638d1d4899aff735dfc5c05
+    m_Address: oak_log
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 4ec08875c62f4e74cab76aa9ffc03375, type: 2}
   m_SchemaSet:

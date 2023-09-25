@@ -10,7 +10,7 @@ public class BuildEditorWindow : EditorWindow
 {
     private string buildPath;
     private string exeName;
-    private BuildTarget buildTarget = BuildTarget.StandaloneWindows;
+    private BuildTarget buildTarget = BuildTarget.StandaloneWindows64;
     private bool developmentBuild = false;
     private bool cleanBuild = false;
     private bool autoOpenFolder = false;

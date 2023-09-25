@@ -16,7 +16,7 @@ namespace TickBased.Logger
 
         public static void LogError(string debugText, string methodCall = "")
         {
-            Debug.LogError($"[{methodCall}] {debugText}");
+            Debug.LogError($"[{methodCall}] <color=red>{debugText}</color>");
         }
     }
 }

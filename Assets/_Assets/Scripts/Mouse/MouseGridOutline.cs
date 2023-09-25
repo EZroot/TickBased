@@ -15,11 +15,12 @@ public class MouseGridOutline : MonoBehaviour
     {
         // Create and populate a new Mesh object
         Vector3[] vertices = new Vector3[4];
+        Vector2[] uvs = new Vector2[4];
         int[] triangles = new int[6];
         Color[] colors = new Color[4];
         int vertexIndex = 0, triangleIndex = 0;
 
-        MeshUtils.CreateSquareByColor(gridCoordinate.X, gridCoordinate.Y, tileSize, vertices, triangles, colors,defaultColor, ref vertexIndex, ref triangleIndex);
+        MeshUtils.CreateSquareByColor(gridCoordinate.X, gridCoordinate.Y, tileSize, vertices, uvs, triangles, colors,defaultColor, ref vertexIndex, ref triangleIndex);
 
         // Create a new GameObject to hold the Mesh
         GameObject tileObj = new GameObject("Tile");

@@ -12,15 +12,19 @@ namespace TickBased.Scripts.Commands
 
         public MoveCommand(ICreatureEntity creatureEntity, GridManager.GridCoordinate targetPosition)
         {
-            TickBased.Logger.Logger.Log($"Movement Command Set {creatureEntity.EntityData.ID} {targetPosition}");
+            TickBased.Logger.Logger.Log($"Movement Command Set {creatureEntity.EntityData.ID} {targetPosition.X},{targetPosition.Y}");
             this._creatureEntity = creatureEntity;
             this.targetPosition = targetPosition;
         }
 
         public IEnumerator Execute()
         {
+            if (_creatureEntity.EntityData.IsDead)
+                yield break;
+            
             float duration = .1f;
             float elapsed = 0;
+
             Vector2 startPosition = _creatureEntity.CreatureTransform.position;
 
             while (elapsed < duration)

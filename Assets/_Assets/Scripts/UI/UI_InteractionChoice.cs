@@ -25,7 +25,7 @@ public class UI_InteractionChoice : MonoBehaviour
         _playerReference = player;
         _interactionButton.onClick.AddListener(() =>
         {
-            action.Invoke();
+            action?.Invoke();
         });
     }
 

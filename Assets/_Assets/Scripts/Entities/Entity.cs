@@ -1,6 +1,7 @@
 using System;
 using FishNet.Object;
 using FearProj.ServiceLocator;
+using TickBased.Utils;
 using UnityEngine;
 public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityData
 {
@@ -8,7 +9,8 @@ public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityD
     public event OnEntityDataChangedDelegate OnEntityDataChanged;
     [SerializeField] protected string _entityDataKey;
     [SerializeField] protected TData _entityData;
-    private GridManager.GridCoordinate _gridCoordinates;
+    [Header("- DEBUG - dont change this")]
+    [SerializeField] protected GridManager.GridCoordinate _gridCoordinates;
     public TData EntityData => _entityData;
     public GridManager.GridCoordinate GridCoordinates => _gridCoordinates;
     
@@ -22,8 +24,9 @@ public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityD
             {
                 if (tmp.ID == _entityDataKey)
                 {
+                    var deepcopydata = DataUtils.DeepCopy(tmp);
                     TickBased.Logger.Logger.Log($"Entity Data: <color=green>[{_entityDataKey}]{tmp.GetType()}</color> assigned to <color=green>{this.GetType()}</color>");
-                    SetEntityData(tmp);
+                    SetEntityData(deepcopydata);
                     break;
                 }
             }
@@ -33,6 +36,7 @@ public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityD
     
     public virtual void Initialize(string entityDataKey)
     {
+        Debug.Log($"INITIALIZING ENTITY {GetType()}");
         var dataMngr = ServiceLocator.Get<IServiceDataManager>();
         var data = dataMngr.GetEntityData<TData>(typeof(TData));
         if (data.Count > 0)
@@ -41,12 +45,14 @@ public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityD
             {
                 if (tmp.ID == entityDataKey)
                 {
-                    TickBased.Logger.Logger.Log($"Entity Data: <color=green>[{entityDataKey}]{tmp.GetType()}</color> assigned to <color=green>{this.GetType()}</color>");
-                    SetEntityData(tmp);
+                    var deepcopydata = DataUtils.DeepCopy(tmp);
+                    //deepcopydata.UniqueID = uniqueID;
+                    SetEntityData(deepcopydata);
                     break;
                 }
             }
         }
+        
         GenerateUniqueID();
     }
 
@@ -76,14 +82,14 @@ public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityD
         throw new System.NotImplementedException();
     }
 
-    public void SetGridCoordinates(int x, int y)
+    public void SetGridCoordinates(int x, int y, GridManager.TileState tileState)
     {
         var gridManager = ServiceLocator.Get<IServiceGridManager>();
 
         //removing previous tile refs
         gridManager.SetTileData(_gridCoordinates.X,_gridCoordinates.Y, new GridManager.Tile(GridManager.TileState.Empty, null));
         _gridCoordinates = new GridManager.GridCoordinate(x, y);
-        gridManager.SetTileData(_gridCoordinates.X,_gridCoordinates.Y, new GridManager.Tile(GridManager.TileState.Object, this));
+        gridManager.SetTileData(_gridCoordinates.X,_gridCoordinates.Y, new GridManager.Tile(tileState, this));
 
     }
     
@@ -105,7 +111,7 @@ public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityD
     [ObserversRpc(BufferLast = true)]
     void RPCSetEntityDataKeyClient(string dataKey)
     {
-        TickBased.Logger.Logger.Log("Setting asdasd client Data", "RPCSetEntityDataClient");
+        TickBased.Logger.Logger.Log($"Setting {dataKey} client Data", "RPCSetEntityDataClient");
         Initialize(dataKey);
     }
 }

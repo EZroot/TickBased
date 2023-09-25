@@ -12,5 +12,9 @@
         Decoration,
         Effect,
         Resource,
-        Object
+        Object,
+        AggressiveEntity,
+        HostileEntity,
+        NeutralEntity,
+        GoodEntity
     }

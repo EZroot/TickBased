@@ -33,6 +33,7 @@ namespace FearProj.ServiceLocator
             ServiceLocator.Register<IServiceGridManager>();
             ServiceLocator.Register<IServiceLightManager>();
             ServiceLocator.Register<IServiceEntityManager>();
+            ServiceLocator.Register<IServiceAIManager>();
         }
     }
 }

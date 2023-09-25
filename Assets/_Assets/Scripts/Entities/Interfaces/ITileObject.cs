@@ -6,6 +6,6 @@
         void OnTileEnter();
         void OnTileExit();
 
-        void SetGridCoordinates(int x, int y);
+        void SetGridCoordinates(int x, int y, GridManager.TileState tileType);
     }
 }

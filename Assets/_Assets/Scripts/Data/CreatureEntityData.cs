@@ -6,6 +6,7 @@ using UnityEngine;
 public class CreatureEntityData : EntityData
 {
     public bool IsPlayer;
+    public bool IsDead;
     public ClientStats ClientStats;
     public CreatureStats CreatureStats;
     public CreatureSprites CreatureSprites;

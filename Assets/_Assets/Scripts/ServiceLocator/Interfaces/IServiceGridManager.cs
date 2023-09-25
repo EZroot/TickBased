@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FearProj.ServiceLocator
@@ -12,6 +13,7 @@ namespace FearProj.ServiceLocator
         public int GridSeed { get; }
         public GridManager.GridData Grid { get; }
         public int TileSize{ get; }
+        public PathFinder PathFinder { get; }
         void InitializeGridBySeed(int seed, GridManager.GridData grid);
         GridManager.Tile GetTile(int x, int y);
         void SetTileData(int x, int y, GridManager.Tile tile);
@@ -19,5 +21,6 @@ namespace FearProj.ServiceLocator
         public Vector2 GridToWorld(int gridX, int gridY);
         public Vector2 GridToWorld(GridManager.GridCoordinate gridCoordinate);
         GridManager.GridCoordinate GetGridPositionFromMouse(Camera camera);
+        public List<GridManager.GridCoordinate> GetClearNeighbors(GridManager.GridCoordinate target);
     }
 }

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Cysharp.Threading.Tasks;
 using TickBased.Utils;
 using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 using Logger = TickBased.Logger.Logger;
 using Random = UnityEngine.Random;
 
@@ -24,7 +25,8 @@ namespace FearProj.ServiceLocator
 
         [SerializeField] private GameObject _chunkPrefab;
         [SerializeField] private GameObject _mouseGridOutlinePrefab;
-
+        [SerializeField] private Texture2D _gameTextureMap;
+        [SerializeField] private bool _colorVerticesOnGenerate = true;
         [Header("- Grid Settings - Must be divisible by 4")] [SerializeField]
         private int _gridSize = 64; //divisible by 4
 
@@ -43,16 +45,22 @@ namespace FearProj.ServiceLocator
         private GridData _gridData;
         private Tile[,] _tiles;
         private Coroutine _rasterizeCoroutine;
+
+        //Pathfinding
+        private PathFinder _pathFinder;
+        
+        //Properties
         public int GridSeed => _gridSeed;
         public int GridSize => _gridSize;
         public int GridTileSize => _tileSize;
 
         public GridData Grid => _gridData;
         public int TileSize => _gridData.TileSize;
+        public PathFinder PathFinder => _pathFinder;
 
         public event Action OnPreGridGeneration;
         public event Action OnPostGridGeneration;
-
+        
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.N))
@@ -71,6 +79,11 @@ namespace FearProj.ServiceLocator
                 }
             }
 
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                SetChunksTexture2D(_gameTextureMap);
+            }
+
             if (Input.GetKeyDown(KeyCode.R))
             {
                 var settings = ServiceLocator.Get<IServiceGameManager>().GameSettings.DataSettings;
@@ -86,11 +99,11 @@ namespace FearProj.ServiceLocator
                 }
             }
 
-            if (Input.GetMouseButtonDown(1))
-            {
-                var pos = GetGridPositionFromMouse(Camera.allCameras[0]);
-                SetTileData(pos.X, pos.Y, new Tile(TileState.Obstacle, null));
-            }
+            // if (Input.GetMouseButtonDown(1))
+            // {
+            //     var pos = GetGridPositionFromMouse(Camera.allCameras[0]);
+            //     SetTileData(pos.X, pos.Y, new Tile(TileState.Obstacle, null));
+            // }
         }
 
         private void FixedUpdate()
@@ -146,13 +159,13 @@ namespace FearProj.ServiceLocator
 
             GenerateMesh();
 
-            for (var axp = 0; axp < 50; axp++)
-            {
-                SetTileColor(axp + 10, 1, Color.red);
-
-                SetTileColor(axp, 2, Color.green);
-                SetTileColor(axp, 3, Color.blue);
-            }
+            // for (var axp = 0; axp < 50; axp++)
+            // {
+            //     SetTileColor(axp + 10, 1, Color.white);
+            //
+            //     SetTileColor(axp, 2, Color.white);
+            //     SetTileColor(axp, 3, Color.clear);
+            // }
 
             var tileSize = grid.TileSize;
             transform.position = new Vector3(-tileSize / 2, -tileSize / 2, 1f);
@@ -162,8 +175,20 @@ namespace FearProj.ServiceLocator
 
             var tickManager = ServiceLocator.Get<IServiceTickManager>();
             tickManager.OnCommandExecuted += UpdateChunkVisibility;
+            
+            
+            //Pathfinding
+            _pathFinder = new PathFinder();
+            
         }
 
+        public void SetChunksTexture2D(Texture2D gameMap)
+        {
+            foreach (var chunk in _gridChunks)
+            {
+                chunk.MeshRenderer.material.mainTexture = gameMap;
+            }
+        }
         public void GenerateMesh()
         {
             CreateChunks();
@@ -185,6 +210,7 @@ namespace FearProj.ServiceLocator
 
                 // Initialize mesh data for this chunk
                 Vector3[] vertices = new Vector3[4 * CHUNK_SIZE * CHUNK_SIZE];
+                Vector2[] uvs = new Vector2[4 * CHUNK_SIZE * CHUNK_SIZE];  // Declare UV array here
                 int[] triangles = new int[6 * CHUNK_SIZE * CHUNK_SIZE];
                 Color[] colors = new Color[4 * CHUNK_SIZE * CHUNK_SIZE];
 
@@ -199,18 +225,37 @@ namespace FearProj.ServiceLocator
                         if (x >= _gridData.Width || y >= _gridData.Height)
                             continue;
 
-                        TickBased.Utils.MeshUtils.CreateSquare(x, y, _gridData.TileSize, vertices, triangles, colors,
-                            ref vertexIndex,
+                        // Calculate chunk offset in texture
+                        float uvOffsetX = (float)(startX) / _gridData.Width;
+                        float uvOffsetY = (float)(startY) / _gridData.Height;
+
+                        // Calculate how much each chunk takes up of the texture
+                        float uvScaleX = (float)(CHUNK_SIZE) / _gridData.Width;
+                        float uvScaleY = (float)(CHUNK_SIZE) / _gridData.Height;
+                        
+                        float uvX = uvOffsetX + ((float)(x - startX) / CHUNK_SIZE) * uvScaleX;
+                        float uvY = uvOffsetY + ((float)(y - startY) / CHUNK_SIZE) * uvScaleY;
+                        float uvWidth = uvScaleX / CHUNK_SIZE;
+                        float uvHeight = uvScaleY / CHUNK_SIZE;
+                        
+                        MeshUtils.CreateSquareUV(
+                            x, y,
+                            _gridData.TileSize,
+                            vertices, triangles, colors, uvs, 
+                            uvX, uvY, 
+                            uvWidth, uvHeight,
+                            ref vertexIndex, 
                             ref triangleIndex);
 
+
                         float noiseValue = perlinGenerator.GetNoiseValue(x, y);
-                        Color perlinColor =
-                            perlinGenerator
-                                .GetTerrainColor(noiseValue); //new Color(noiseValue, noiseValue, noiseValue);
+                        Color perlinColor = _colorVerticesOnGenerate == false ? Color.white : 
+                            perlinGenerator.GetTerrainColor(noiseValue,x,y); //new Color(noiseValue, noiseValue, noiseValue);
                         for (int i = vertexIndex - 4; i < vertexIndex; i++)
                         {
                             colors[i] = perlinColor;
                         }
+                        
 
                         // Color randomColor = new Color(Random.value, Random.value, Random.value);
                         // for (int i = vertexIndex - 4; i < vertexIndex; i++)
@@ -224,6 +269,7 @@ namespace FearProj.ServiceLocator
                 Mesh mesh = new Mesh();
                 mesh.vertices = vertices;
                 mesh.triangles = triangles;
+                mesh.uv = uvs;
                 mesh.colors = colors;
                 chunk.MeshFilter.mesh = mesh;
             }
@@ -408,7 +454,32 @@ namespace FearProj.ServiceLocator
             }
         }
 
+        public List<GridCoordinate> GetClearNeighbors(GridCoordinate target)
+        {
+            var gridmgr = ServiceLocator.Get<IServiceGridManager>();
+            List<GridCoordinate> clearNeighbors = new List<GridCoordinate>();
 
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if (dx == 0 && dy == 0) continue;
+
+                    int newX = target.X + dx;
+                    int newY = target.Y + dy;
+
+                    var neighborTile = gridmgr.GetTile(newX, newY);
+            
+                    if (neighborTile.State == GridManager.TileState.Empty)
+                    {
+                        clearNeighbors.Add(new GridCoordinate(newX, newY));
+                    }
+                }
+            }
+
+            return clearNeighbors;
+        }
+        
         public GridCoordinate GetGridPositionFromMouse(Camera camera)
         {
             Vector3 mousePosition = Input.mousePosition;
@@ -423,7 +494,6 @@ namespace FearProj.ServiceLocator
         public bool TileRaycast(int startX, int startY, int endX, int endY, out Tile blockingTile, int thickness = 1)
         {
             blockingTile = new Tile();
-
             // Angle of the ray
             float angle = Mathf.Atan2(endY - startY, endX - startX);
 
@@ -450,24 +520,13 @@ namespace FearProj.ServiceLocator
                 dx *= 2;
                 dy *= 2;
 
-                int debugCounter = 0;
 
                 for (; n > 0; --n)
                 {
-//                     if (debugCounter % 10 == 0)
-//                     {
-// #if UNITY_EDITOR
-//                         Vector3 worldStart = GridToWorld(newStartX, newStartY);
-//                         Vector3 worldEnd = GridToWorld(x, y);
-//                         Debug.DrawRay(worldStart, worldEnd - worldStart, Color.red, 1f);
-// #endif
-//                     }
-
-                    debugCounter++;
                     if (x >= 0 && x < _gridData.Width && y >= 0 && y < _gridData.Height)
                     {
                         Tile tile = GetTile(x, y);
-                        if (tile.State == TileState.Obstacle)
+                        if (tile.State is TileState.Obstacle)
                         {
                             blockingTile = tile;
                             return true;
@@ -503,39 +562,6 @@ namespace FearProj.ServiceLocator
             float worldY = gridCoordinate.Y * TileSize;
             return new Vector2(worldX, worldY);
         }
-
-        // void OnDrawGizmos()
-        // {
-        //     var gridWidth = _gridData.Width;
-        //     var gridHeight = _gridData.Height;
-        //     Gizmos.color = Color.gray;
-        //     // for (int x = 0; x <= _gridData.Width; x++)
-        //     // {
-        //     //     Gizmos.DrawLine(new Vector3(x * TileSize, 0, 0), new Vector3(x * TileSize, gridHeight, 0));
-        //     // }
-        //     //
-        //     // for (int y = 0; y <= _gridData.Height; y++)
-        //     // {
-        //     //     Gizmos.DrawLine(new Vector3(0, y * TileSize, 0), new Vector3(gridWidth, y * TileSize, 0));
-        //     // }
-        //
-        //     Gizmos.color = Color.black;
-        //     for (int x = 0; x < gridWidth; x++)
-        //     {
-        //         for (int y = 0; y < gridHeight; y++)
-        //         {
-        //             Gizmos.DrawWireCube(new Vector3(x * TileSize, y * TileSize, 0), new Vector3(TileSize, TileSize, 0));
-        //         }
-        //     }
-        //
-        //     Camera camera = Camera.allCameras[0]; // Or your specific camera
-        //     GridCoordinate coord = GetGridPositionFromMouse(camera);
-        //
-        //     Vector3 worldPosition = new Vector3(coord.X * _tileSize, coord.Y * _tileSize, 0);
-        //
-        //     Gizmos.color = Color.red; // Set the color
-        //     Gizmos.DrawCube(worldPosition, new Vector3(_tileSize, _tileSize, 1)); // Draw a cube at the grid position
-        // }
 
         [System.Serializable]
         public struct GridData
@@ -607,5 +633,39 @@ namespace FearProj.ServiceLocator
                 ObjectOnTile = objectOnTile;
             }
         }
+        
+        
+        // void OnDrawGizmos()
+        // {
+        //     var gridWidth = _gridData.Width;
+        //     var gridHeight = _gridData.Height;
+        //     Gizmos.color = Color.gray;
+        //     // for (int x = 0; x <= _gridData.Width; x++)
+        //     // {
+        //     //     Gizmos.DrawLine(new Vector3(x * TileSize, 0, 0), new Vector3(x * TileSize, gridHeight, 0));
+        //     // }
+        //     //
+        //     // for (int y = 0; y <= _gridData.Height; y++)
+        //     // {
+        //     //     Gizmos.DrawLine(new Vector3(0, y * TileSize, 0), new Vector3(gridWidth, y * TileSize, 0));
+        //     // }
+        //
+        //     Gizmos.color = Color.black;
+        //     for (int x = 0; x < gridWidth; x++)
+        //     {
+        //         for (int y = 0; y < gridHeight; y++)
+        //         {
+        //             Gizmos.DrawWireCube(new Vector3(x * TileSize, y * TileSize, 0), new Vector3(TileSize, TileSize, 0));
+        //         }
+        //     }
+        //
+        //     Camera camera = Camera.allCameras[0]; // Or your specific camera
+        //     GridCoordinate coord = GetGridPositionFromMouse(camera);
+        //
+        //     Vector3 worldPosition = new Vector3(coord.X * _tileSize, coord.Y * _tileSize, 0);
+        //
+        //     Gizmos.color = Color.red; // Set the color
+        //     Gizmos.DrawCube(worldPosition, new Vector3(_tileSize, _tileSize, 1)); // Draw a cube at the grid position
+        // }
     }
 }

@@ -12,6 +12,7 @@ namespace FearProj.ServiceLocator
         public int CurrentTick { get; }
         public bool IsExecutingTick { get; }
         public TickManager.TickMode TickExecutionMode { get; set; }
+        public TickManager.TickModeRealTimeType TickModeRealTime { get; }
         public void QueueCommand(string creatureUniqueID, ICommand command, int tickToExecute);
         public void ManualTick();
         public void StopManualTickCoroutine();

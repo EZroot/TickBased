@@ -39,30 +39,38 @@ public class PerlinNoiseGenerator
         return gradient * gradient; // Square the gradient for more natural falloff
     }
 
-    public Color GetTerrainColor(float noiseValue)
+    public Color GetTerrainColor(float noiseValue, int x, int y)
     {
         Color perlinColor;
 
-        if (noiseValue < 0.2f)
+        // Biome noise
+        float biomeNoise = Mathf.PerlinNoise(x * 0.1f, y * 0.1f);
+
+        // Check for specific biomes
+        if (biomeNoise > 0.7f)
         {
-            perlinColor = Color.blue; // Water
+            // Desert Biome
+            if (noiseValue < 0.2f) perlinColor = new Color(0.1f, 0.1f, 0.5f); // Dark Water
+            else if (noiseValue < 0.4f) perlinColor = new Color(0.95f, 0.85f, 0.4f); // Light Sand
+            else perlinColor = new Color(0.8f, 0.7f, 0.3f); // Dark Sand
         }
-        else if (noiseValue < 0.4f)
+        else if (biomeNoise < 0.3f)
         {
-            perlinColor = new Color(0.9f, 0.7f, 0.4f); // Sand
-        }
-        else if (noiseValue < 0.6f)
-        {
-            perlinColor = new Color(0.5f, 0.35f, 0.1f); // Ground
-        }
-        else if (noiseValue < 0.8f)
-        {
-            perlinColor = Color.green; // Grass
+            // Forest Biome
+            if (noiseValue < 0.2f) perlinColor = new Color(0.0f, 0.2f, 0.6f); // Water
+            else if (noiseValue < 0.4f) perlinColor = new Color(0.35f, 0.45f, 0.25f); // Mossy Ground
+            else perlinColor = new Color(0.1f, 0.5f, 0.1f); // Forest Ground
         }
         else
         {
-            perlinColor = Color.grey; // Mountain
+            // Default Biome
+            if (noiseValue < 0.2f) perlinColor = new Color(0.0f, 0.2f, 0.6f); // Water
+            else if (noiseValue < 0.4f) perlinColor = new Color(0.85f, 0.7f, 0.45f); // Sand
+            else if (noiseValue < 0.6f) perlinColor = new Color(0.45f, 0.3f, 0.15f); // Ground
+            else if (noiseValue < 0.8f) perlinColor = new Color(0.2f, 0.6f, 0.2f); // Grass
+            else perlinColor = new Color(0.6f, 0.6f, 0.6f); // Mountain
         }
+
 
         return perlinColor;
     }

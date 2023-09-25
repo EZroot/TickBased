@@ -35,6 +35,36 @@ MonoBehaviour:
     m_SerializedLabels:
     - entitydataso
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c03eb15764724054184c871fc4a56a4e
+    m_Address: Assets/_Assets/SOSettings/AddressableEntityData/AggressiveCreatureData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - entitydataso
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 599b4022347237e4eb0f34b47bbd42e4
+    m_Address: Assets/_Assets/SOSettings/AddressableEntityData/LogWallEntityData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - entitydataso
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 969deae68d7f5174b8583e13edb397ae
+    m_Address: Assets/_Assets/SOSettings/AddressableEntityData/AggressiveCreature_ZombieData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - entitydataso
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 471a6636dd8e0944db9bf2378f3729a0
+    m_Address: Assets/_Assets/SOSettings/AddressableEntityData/AggressiveCreature_ZombieUglyData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - entitydataso
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e821efbab3935544a87c7283ddc71c99
+    m_Address: Assets/_Assets/SOSettings/AddressableEntityData/ResourceEntityData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - entitydataso
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 4ec08875c62f4e74cab76aa9ffc03375, type: 2}
   m_SchemaSet:

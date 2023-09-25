@@ -35,3 +35,7 @@ MonoBehaviour:
     addressableLabel: prefab_resource
   - entityType: 11
     addressableLabel: prefab_object
+  - entityType: 12
+    addressableLabel: prefab_aggressive
+  - entityType: 13
+    addressableLabel: prefab_hostile

@@ -495,6 +495,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &746512744
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 746512746}
+  - component: {fileID: 746512745}
+  m_Layer: 0
+  m_Name: AIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &746512745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746512744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b865b06b8bdc430aad969c216f8d07b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &746512746
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746512744}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 13.661608, y: 14.263348, z: -0.027606152}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &886026058
 GameObject:
   m_ObjectHideFlags: 0
@@ -577,11 +621,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _unreliableMTU: 1023
-  _ipv4BindAddress: 
+  _ipv4BindAddress: 0.0.0.0
   _ipv6BindAddress: 
-  _port: 7770
+  _port: 7070
   _maximumClients: 4095
-  _clientAddress: localhost
+  _clientAddress: 
   _timeout: 15
 --- !u!1 &1016498262
 GameObject:
@@ -680,7 +724,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.9411765}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -735,6 +779,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tickMode: 0
+  _tickModeRealTimeType: 0
+  _commandExecutionMode: 1
 --- !u!4 &1398878940
 Transform:
   m_ObjectHideFlags: 0
@@ -797,6 +843,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _fishnetNetworkManager: {fileID: 886026059}
+  _clientAddress: 192.168.0.6
+  _devServer: 1
 --- !u!1 &1468776308
 GameObject:
   m_ObjectHideFlags: 0
@@ -874,12 +922,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _chunkPrefab: {fileID: 8566397856637911073, guid: 5bff9430eaea3c54bbc8560e084de133, type: 3}
   _mouseGridOutlinePrefab: {fileID: 6517309983825213275, guid: 7e4081d1e4b52cc4d9c98442109f447a, type: 3}
-  _gridSize: 1024
+  _gameTextureMap: {fileID: 2800000, guid: a5581e84a60e46144a2066f0af1a014a, type: 3}
+  _colorVerticesOnGenerate: 1
+  _gridSize: 64
   _tileSize: 2
   _seed: 6969
-  _perlinNoiseLayer1Scale: 0.1
-  _perlinNoiseLayer2Scale: 0.21
-  _distanceFromEdgeToGenerate: 0.289
+  _perlinNoiseLayer1Scale: 0.175
+  _perlinNoiseLayer2Scale: 0.036
+  _distanceFromEdgeToGenerate: 0.43
 --- !u!4 &1769217183
 Transform:
   m_ObjectHideFlags: 0
@@ -1212,3 +1262,4 @@ SceneRoots:
   - {fileID: 1468776310}
   - {fileID: 92166778}
   - {fileID: 657927160}
+  - {fileID: 746512746}

@@ -29,6 +29,24 @@ MonoBehaviour:
     m_SerializedLabels:
     - prefab_object
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0fb23d219cde02a4b85ef64130c57567
+    m_Address: Assets/_Assets/NetworkedPrefabs/AggressiveEntity.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab_aggressive
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f1fbd8762917bde45b54f337a077e387
+    m_Address: Assets/_Assets/NetworkedPrefabs/WallEntity.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab_wall
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 220e3c13f1cbede43817ae4f5aa066df
+    m_Address: Assets/_Assets/NetworkedPrefabs/ResourceEntity.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - prefab_resource
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 4ec08875c62f4e74cab76aa9ffc03375, type: 2}
   m_SchemaSet:

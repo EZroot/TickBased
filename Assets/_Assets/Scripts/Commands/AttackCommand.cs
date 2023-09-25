@@ -28,6 +28,9 @@ namespace TickBased.Scripts.Commands
 
         public IEnumerator Execute()
         {
+            if (_currentCreatureEntity.EntityData.IsDead)
+                yield break;
+            
             // Save original position
             Vector2 originalPosition = _currentCreatureEntity.CreatureTransform.position;
             Vector2 targetPosition = _targetCreatureEntity.CreatureTransform.position;
