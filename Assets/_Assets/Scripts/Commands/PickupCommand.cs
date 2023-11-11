@@ -56,5 +56,12 @@ namespace TickBased.Scripts.Commands
 
             _currentCreatureEntity.CreatureTransform.position = originalPosition;
         }
+
+        public void ExecuteImmediately()
+        {
+            // Apply pickup logic
+            var pickedup = _inventoryItem.PickUp();
+            _currentCreatureEntity.CreatureInventory.AddItem(pickedup);
+        }
     }
 }

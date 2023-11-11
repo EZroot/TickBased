@@ -292,6 +292,10 @@ MonoBehaviour:
     CreatureStats:
       Name: 
       MovementSpeed: 0
+      Faction:
+        FactionName: 
+        FactionDescription: 
+        FactionType: 1
       CreatureLimbs: []
     CreatureSprites:
       SpriteAddressableKey: 
@@ -301,11 +305,14 @@ MonoBehaviour:
     X: 0
     Y: 0
   _entityVision: 8
+  _collisionRadius: 2
   _entityWearables: {fileID: 5190251780039170798}
   _ghostEntityWearables: {fileID: 5739908358178975580}
   _creatureTransform: {fileID: 3771874853149439487}
   _ghostTransform: {fileID: 6814072924197442778}
   _occupiedTileState: 2
+  _creatureInventory:
+    _inventoryItems: []
   _deathEffect: {fileID: 8709172265031101932}
   _ghostGridPosition:
     X: 0

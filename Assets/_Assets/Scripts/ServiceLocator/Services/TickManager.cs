@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using TickBased.Scripts.Commands;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Debug = UnityEngine.Debug;
+using Logger = TickBased.Logger.Logger;
 
 namespace FearProj.ServiceLocator
 {
@@ -34,13 +38,18 @@ namespace FearProj.ServiceLocator
 
         private int _currentTick = 0;
         private WaitForSeconds _commandDelay = new WaitForSeconds(0.25f);
+        private WaitCommand _waitCommand;
 
         //temporarily serilaizable so we can mess with it in debug
         [SerializeField] private TickMode _tickMode;
         [SerializeField] private TickModeRealTimeType _tickModeRealTimeType;
         [SerializeField] private CommandExecutionMode _commandExecutionMode;
+        [Header("This can cause issues when switching from forced wait to player cmd wait")]
+        [SerializeField] private bool _usePostTickDelay;
+        [SerializeField] private float _postTickDelay = 1f;
         private Coroutine _realTimeTickCoroutine;
         private bool _isExecutingTick;
+        private WaitForSeconds _tickDelayWaitForSeconds;
         public delegate void CommandReceivedHandler(string uniqueCreatureID, ICommand command, int executionTick);
 
         public event CommandReceivedHandler OnCommandReceived;
@@ -69,14 +78,32 @@ namespace FearProj.ServiceLocator
             }
         }
 
-        public TickModeRealTimeType TickModeRealTime => _tickModeRealTimeType;
+        public TickModeRealTimeType TickModeRealTime
+        {
+            get { return _tickModeRealTimeType; }
+            set => _tickModeRealTimeType = value;
+        }
 
+        public CommandExecutionMode CommandExecutionType
+        {
+            get => _commandExecutionMode;
+            set => _commandExecutionMode = value;
+        }
+
+
+        private void OnGUI()
+        {
+            GUI.Box(new Rect(0,0,205,110), "TickManager");
+            GUI.Label(new Rect(10, 15, 200, 20), $"{TickExecutionMode.ToString()}");
+            GUI.Label(new Rect(10, 35, 200, 20), $"{TickModeRealTime.ToString()}");
+            GUI.Label(new Rect(10, 55, 200, 20), $"{CommandExecutionType.ToString()}");
+            GUI.Label(new Rect(10, 75, 200, 20), $"Tick: {CurrentTick}");
+        }
+        
         void Start()
         {
-            // if (_tickMode == TickMode.RealTime)
-            // {
-            //     _realTimeTickCoroutine = StartCoroutine(RealTimeTickCoroutine());
-            // }
+            _waitCommand = new WaitCommand();
+            _tickDelayWaitForSeconds = new WaitForSeconds(_postTickDelay);
         }
 
         public void QueueCommand(string creatureUniqueID, ICommand command, int tickToExecute)
@@ -121,65 +148,103 @@ namespace FearProj.ServiceLocator
 
         public IEnumerator ManualTickEnumerator()
         {
+            if (_isExecutingTick)
+                yield break;
             _isExecutingTick = true;
             PreTick?.Invoke(); //collisions and other actions should happen after movement?
-
-            TickBased.Logger.Logger.Log($"Manual Tick called {_currentTick} ", "TickManager");
+           // TickBased.Logger.Logger.Log($"Manual Tick called {_currentTick} ", "TickManager");
             yield return ExecuteCommands();
             _currentTick++;
-            var aiManager = ServiceLocator.Get<IServiceAIManager>();
-            yield return aiManager.ExecuteAICalculations();
+            //var aiManager = ServiceLocator.Get<IServiceAIManager>();
+           // aiManager.CalculateAllAI();
+
+            //aiManager.ExecuteAICalculationsImmediately(); this is slower lol
+            //yield return aiManager.ExecuteAICalculations();
+            var pt = new Stopwatch();
+            pt.Start();
             PostTick?.Invoke(); //collisions and other actions should happen after movement?
+            pt.Stop();
+            // Logger.LogError($"POST TICK {pt.ElapsedMilliseconds}ms");
+            var aiManager = ServiceLocator.Get<IServiceAIManager>();
+            //yield return aiManager.CalculateAllAI();
+            //pt.Reset();
+            //pt.Start();
+            aiManager.CalculateAllAIImmediately();
+            //pt.Stop();
+
+            if (_usePostTickDelay)
+                yield return _tickDelayWaitForSeconds;
+            // Logger.LogError($"AI CALC {pt.ElapsedMilliseconds}ms");
+
             _isExecutingTick = false;
         }
-
+        
         private IEnumerator ExecuteCommands()
         {
-            TickBased.Logger.Logger.Log("Executing Command", "TickManager");
+            //TickBased.Logger.Logger.Log("Executing Command", "TickManager");
             if (_commandQueue.ContainsKey(_currentTick))
             {
                 List<Coroutine> runningCoroutines = new List<Coroutine>();
-                const int chunkSize = 4; // Choose an appropriate chunk size
-
+                List<IEnumerator> runningEnumeartors = new List<IEnumerator>();
                 foreach (var creatureCommands in _commandQueue[_currentTick])
                 {
-                    TickBased.Logger.Logger.Log("Starting Execute Command Coroutine", "TickManager");
+                   // TickBased.Logger.Logger.Log("Starting Execute Command Coroutine", "TickManager");
                     List<ICommand> commands = creatureCommands.Value;
-                    
+                    int batchSize = 3; // or any other number that works well
                     if (_commandExecutionMode == CommandExecutionMode.Sequentially)
                     {
-                        yield return ExecuteCommandsCoroutine(commands);
+                       // yield return ExecuteCommandsCoroutine(commands);
+                       for (int i = 0; i < commands.Count; i += batchSize)
+                       {
+                           List<ICommand> batch = commands.Skip(i).Take(batchSize).ToList();
+                           var cr = ExecuteCommandsCoroutine(batch);
+                           runningEnumeartors.Add(cr);
+                       }
                     }
                     else if (_commandExecutionMode == CommandExecutionMode.Concurrently)
                     {
-                        for (int i = 0; i < commands.Count; i += chunkSize)
+                        foreach (var cmd in commands)
                         {
-                            List<ICommand> commandChunk = commands.Skip(i).Take(chunkSize).ToList();
-                            Coroutine cr = StartCoroutine(ExecuteCommandsCoroutine(commandChunk));
-                            runningCoroutines.Add(cr);
+                            cmd.ExecuteImmediately();
+                            yield return null;
                         }
+
+                        var pp = new Stopwatch();
+                        pp.Start();
+                        //OnCommandExecuted?.Invoke();
+                        pp.Stop();
+//                        TickBased.Logger.Logger.LogError($"ON CMD EXECUTE {pp.ElapsedMilliseconds}ms");
+                        // for (int i = 0; i < commands.Count; i += batchSize)
+                        // {
+                        //     List<ICommand> batch = commands.Skip(i).Take(batchSize).ToList();
+                        //     var cr = StartCoroutine(ExecuteCommandsCoroutine(batch));
+                        //     runningCoroutines.Add(cr);
+                        // }
+                        yield return null;
+
                     }
+    
                 }
 
                 // // Wait for all coroutines to complete
-                if (_commandExecutionMode == CommandExecutionMode.Concurrently)
+                if (_commandExecutionMode == CommandExecutionMode.Sequentially)
                 {
-                    foreach (Coroutine cr in runningCoroutines)
+                    Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>(runningEnumeartors);
+                    while(coroutineQueue.Count > 0)
                     {
-                        yield return cr;
+                        yield return coroutineQueue.Dequeue();
+                        yield return null;
                     }
                 }
-
-                //_commandQueue.Remove(_currentTick);
             }
         }
 
+
         private IEnumerator ExecuteCommandsCoroutine(List<ICommand> commandsToExecute)
         {
-            commandsToExecute.Add(new WaitCommand()); //sending this to update the player collision after last action
+            commandsToExecute.Add(_waitCommand); //sending this to update the player collision after last action
             foreach (var command in commandsToExecute)
             {
-                TickBased.Logger.Logger.Log($"Executing command: {command.GetType()}", "TickManager");
 
                 yield return command.Execute();
                 OnCommandExecuted?.Invoke();
@@ -189,6 +254,20 @@ namespace FearProj.ServiceLocator
             }
         }
 
+        private void ExecuteCommandsImmediately(List<ICommand> commandsToExecute)
+        {
+            commandsToExecute.Add(_waitCommand); //sending this to update the player collision after last action
+            foreach (var command in commandsToExecute)
+            {
+
+                command.ExecuteImmediately();
+                OnCommandExecuted?.Invoke();
+                //
+                // if (TickExecutionMode == TickMode.Manual)
+                //     yield return _commandDelay;
+            }
+            
+        }
         public bool CheckIfCreatureCanIssueCommandThisTick(string creatureUniqueID)
         {
             if (TickExecutionMode == TickMode.RealTime)

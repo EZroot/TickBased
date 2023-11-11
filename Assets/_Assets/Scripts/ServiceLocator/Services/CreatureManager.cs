@@ -12,6 +12,13 @@ namespace FearProj.ServiceLocator
         public List<ICreatureEntity> AllPlayersInScene => _allPlayersInScene;
         public PlayerEntity Player => _player;
 
+        private void OnGUI()
+        {
+            GUI.Box(new Rect(0,110,205,65), "CreatureManager");
+            GUI.Label(new Rect(10, 135, 200, 20), $"Creatures: {AllCreaturesInScene.Count}");
+            GUI.Label(new Rect(10, 155, 200, 20), $"Players: {AllPlayersInScene.Count}");
+        }
+        
         public void SetPlayer(PlayerEntity player)
         {
             _player = player;

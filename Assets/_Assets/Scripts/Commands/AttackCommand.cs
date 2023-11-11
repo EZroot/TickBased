@@ -59,5 +59,16 @@ namespace TickBased.Scripts.Commands
 
             _currentCreatureEntity.CreatureTransform.position = originalPosition;
         }
+
+        public void ExecuteImmediately()
+        {
+            Vector2 originalPosition = _currentCreatureEntity.CreatureTransform.position;
+            Vector2 targetPosition = _targetCreatureEntity.CreatureTransform.position;
+            Vector2 direction = targetPosition - originalPosition;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90;
+            _currentCreatureEntity.SetDirection(Quaternion.AngleAxis(angle, Vector3.forward));
+            _targetCreatureEntity.EntityData.ActionDamage(_attackType,_targetLimbName,_attackDamage);
+
+        }
     }
 }

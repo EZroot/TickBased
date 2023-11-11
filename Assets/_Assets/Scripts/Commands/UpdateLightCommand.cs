@@ -9,5 +9,10 @@ namespace TickBased.Scripts.Commands
         {
             throw new System.NotImplementedException();
         }
+
+        public void ExecuteImmediately()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

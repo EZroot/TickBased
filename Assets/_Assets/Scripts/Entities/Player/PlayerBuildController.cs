@@ -55,7 +55,7 @@ public class PlayerBuildController : NetworkBehaviour
 
                         gridMgr.SetTileData(mousePos.X, mousePos.Y,
                             new GridManager.Tile(GridManager.TileState.Obstacle, null));
-                        RPCLoadEntityServer(_typeToBuild, mousePos, _typeToBuildDataID);
+                        RPCLoadEntityServer(_typeToBuild, mousePos, _typeToBuildDataID, 1);
                     }
                 }
             }
@@ -73,7 +73,7 @@ public class PlayerBuildController : NetworkBehaviour
     }
    
     [ServerRpc(RequireOwnership = false)]
-    void RPCLoadEntityServer(EntityType entityType, GridManager.GridCoordinate coordinates, string dataKey)
+    void RPCLoadEntityServer(EntityType entityType, GridManager.GridCoordinate coordinates, string dataKey,int startingWork)
     {
         var dataType = ServiceLocator.Get<IServiceDataManager>().GetEntityDataType(dataKey);
         if (dataType != null)
@@ -81,7 +81,7 @@ public class PlayerBuildController : NetworkBehaviour
             MethodInfo method = GetType()
                 .GetMethod("LoadAndInitializeEntity", BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo genericMethod = method.MakeGenericMethod(dataType);
-            StartCoroutine((IEnumerator)genericMethod.Invoke(this, new object[] { entityType, coordinates, dataKey }));
+            StartCoroutine((IEnumerator)genericMethod.Invoke(this, new object[] { entityType, coordinates, dataKey, startingWork }));
         }
         else
         {
@@ -90,7 +90,7 @@ public class PlayerBuildController : NetworkBehaviour
         //StartCoroutine(LoadAndInitializeEntity<AggressiveEntityData>(entityType, coordinates, dataKey));
     }
 
-    IEnumerator LoadAndInitializeEntity<TDataType>(EntityType entityType, GridManager.GridCoordinate coordinates, string dataKey) where TDataType : EntityData
+    IEnumerator LoadAndInitializeEntity<TDataType>(EntityType entityType, GridManager.GridCoordinate coordinates, string dataKey, int startingWork) where TDataType : EntityData
     {
         var entityManager = ServiceLocator.Get<IServiceEntityManager>();
         var entityTask = entityManager.LoadEntity<TDataType>(entityType, coordinates);
@@ -103,6 +103,6 @@ public class PlayerBuildController : NetworkBehaviour
         });
         yield return null;
         var buildable = result as IBuildableObject;
-        buildable.RPCSetBuildableDataKeyServer(dataKey, 1);
+        buildable.RPCSetBuildableDataKeyServer(dataKey, startingWork);
     }
 }

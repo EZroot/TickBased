@@ -88,7 +88,9 @@ public class Entity<TData> : NetworkBehaviour, ITileObject where TData : EntityD
 
         //removing previous tile refs
         gridManager.SetTileData(_gridCoordinates.X,_gridCoordinates.Y, new GridManager.Tile(GridManager.TileState.Empty, null));
+        PathFinder.occupiedSquares.Remove(_gridCoordinates);
         _gridCoordinates = new GridManager.GridCoordinate(x, y);
+        PathFinder.occupiedSquares.Add(_gridCoordinates);
         gridManager.SetTileData(_gridCoordinates.X,_gridCoordinates.Y, new GridManager.Tile(tileState, this));
 
     }

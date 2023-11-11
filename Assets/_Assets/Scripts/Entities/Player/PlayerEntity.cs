@@ -11,33 +11,40 @@ using Random = UnityEngine.Random;
 public class PlayerEntity : CreatureEntity<PlayerEntityData>
 {
     [SerializeField] private DisableNetworkObjects _disableNetworkObjects;
-
     private PlayerMobileInput _playerMobileInput;
     private float _inputTimer = 0f;
     private float _inputDelay = .25f;
-
     #region -- Unity Methods --
-
     void Awake()
     {
         var sceneManager = ServiceLocator.Get<IServiceSceneManager>();
         sceneManager.OnSceneFinishedLoading += On_SceneLoad;
     }
-
+    private void OnGUI()
+    {
+        if (IsOwner == false)
+            return;
+        var xPos = Screen.width - 250;
+        GUI.Box(new Rect(xPos,0,205,160), "Player");
+        GUI.Label(new Rect(xPos, 15, 200, 20), $"Character: [{GridCoordinates.X},{GridCoordinates.Y}]");
+        GUI.Label(new Rect(xPos, 35, 200, 20), $"Ghost: [{_ghostGridPosition.X},{_ghostGridPosition.Y}]");
+        GUI.Label(new Rect(xPos, 55, 200, 20), $"ID: {EntityData.UniqueID}");
+        GUI.Label(new Rect(xPos, 75, 200, 20), $"User: {EntityData.ClientStats.Username}");
+        GUI.Label(new Rect(xPos, 95, 200, 20), $"Vision: {EntityVision}");
+        GUI.Label(new Rect(xPos, 115, 200, 20), $"Faction: {EntityData.CreatureStats.Faction.FactionType}");
+    }
     public override void Start()
     {
         base.Start();
         TickBased.Logger.Logger.Log("Start called", "PlayerEntity");
         var playerManager = ServiceLocator.Get<IServicePlayerManager>();
-
         playerManager.AddPlayer(this);
 
         OnEntityDataChanged += SaveEntityData;
         var tickManager = ServiceLocator.Get<IServiceTickManager>();
-        tickManager.OnCommandExecuted +=
+        tickManager.PostTick +=
             OnCommandExecuted_CollisionUpdate; //were doin this to check collision after every movement/attack
-        OnGhostEntityMovement += OnGhostEntityMovement_CollisionUpdate; //updating our ghost so we can execute commands
-        
+        //
 #if UNITY_ANDROID && !UNITY_EDITOR
         _playerMobileInput = new PlayerMobileInput();
 #endif
@@ -73,15 +80,16 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
                 });
             #else
             var tickManager = ServiceLocator.Get<IServiceTickManager>();
-            if (tickManager.TickExecutionMode == TickManager.TickMode.RealTime)
+            if (tickManager.TickExecutionMode == TickManager.TickMode.RealTime && tickManager.IsExecutingTick == false)
             {
                 _inputTimer += Time.deltaTime;
-
-                if (_inputTimer >= _inputDelay && tickManager.IsExecutingTick == false)
-                {
+                
+                //if (_inputTimer >= _inputDelay && tickManager.IsExecutingTick == false)
+                //{
                     var gridManager = ServiceLocator.Get<IServiceGridManager>();
                     if (Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.W))
                     {
+                        
                         var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y + 1);
                         var tile = gridManager.GetTile(newPos.X, newPos.Y);
                         if(tile.State == GridManager.TileState.Empty)
@@ -89,6 +97,7 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
                     }
                     else if (Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.S))
                     {
+                        
                         var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y - 1);
                         var tile = gridManager.GetTile(newPos.X, newPos.Y);
                         if(tile.State == GridManager.TileState.Empty)
@@ -96,14 +105,16 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
                     }
                     else if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.W))
                     {
-                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y + 1);
+                               
+                 var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y + 1);
                         var tile = gridManager.GetTile(newPos.X, newPos.Y);
                         if(tile.State == GridManager.TileState.Empty)
                             RPCSendCommandMoveServer(newPos, true);
                     }
                     else if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S))
                     {
-                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y - 1);
+                                 
+               var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y - 1);
                         var tile = gridManager.GetTile(newPos.X, newPos.Y);
                         if(tile.State == GridManager.TileState.Empty)
                             RPCSendCommandMoveServer(newPos, true);
@@ -111,76 +122,88 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
                     
                     else if (Input.GetKey(KeyCode.D))
                     {
-                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y);
+                                     
+           var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y);
                         var tile = gridManager.GetTile(newPos.X, newPos.Y);
                         if(tile.State == GridManager.TileState.Empty)
                             RPCSendCommandMoveServer(newPos, true);
                     }
                     else if (Input.GetKey(KeyCode.A))
                     {
-                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y);
+                                        
+        var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y);
                         var tile = gridManager.GetTile(newPos.X, newPos.Y);
                         if(tile.State == GridManager.TileState.Empty)
                             RPCSendCommandMoveServer(newPos, true);
                     }
                     else if (Input.GetKey(KeyCode.W))
                     {
-                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y + 1);
+                                        
+        var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y + 1);
                         var tile = gridManager.GetTile(newPos.X, newPos.Y);
                         if(tile.State == GridManager.TileState.Empty)
                             RPCSendCommandMoveServer(newPos, true);
                     }
                     else if (Input.GetKey(KeyCode.S))
                     {
-                        var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y - 1);
+                                        
+        var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y - 1);
                         var tile = gridManager.GetTile(newPos.X, newPos.Y);
                         if(tile.State == GridManager.TileState.Empty)
                             RPCSendCommandMoveServer(newPos, true);
                     }
 
-                    _inputTimer = 0f;
-                }
+                 //   _inputTimer = 0f;
+                //}
             }
-            else
+            else if (tickManager.IsExecutingTick == false)
             {
                 if (Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.W))
                 {
-                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y + 1);
+                                          
+  var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y + 1);
                     RPCSendCommandMoveServer(newPos, true);
                 }
                 else if (Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.S))
                 {
-                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y - 1);
+                                          
+  var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y - 1);
                     RPCSendCommandMoveServer(newPos, true);
                 }
                 else if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.W))
                 {
-                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y + 1);
+                                          
+  var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y + 1);
                     RPCSendCommandMoveServer(newPos, true);
                 }
                 else if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S))
                 {
-                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y - 1);
+                                          
+  var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y - 1);
                     RPCSendCommandMoveServer(newPos, true);
                 }
                 else if (Input.GetKeyDown(KeyCode.D))
                 {
-                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y);
+                                         
+   var newPos = new GridManager.GridCoordinate(GridCoordinates.X + 1, GridCoordinates.Y);
                     RPCSendCommandMoveServer(newPos, true);
                 }
                 else if (Input.GetKeyDown(KeyCode.A))
                 {
-                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y);
+                                          
+  var newPos = new GridManager.GridCoordinate(GridCoordinates.X - 1, GridCoordinates.Y);
                     RPCSendCommandMoveServer(newPos, true);
                 }
                 else if (Input.GetKeyDown(KeyCode.W))
                 {
-                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y + 1);
+                                         
+   var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y + 1);
                     RPCSendCommandMoveServer(newPos, true);
                 }
                 else if (Input.GetKeyDown(KeyCode.S))
                 {
-                    var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y - 1);
+                                         
+   var newPos = new GridManager.GridCoordinate(GridCoordinates.X, GridCoordinates.Y - 1);
                     RPCSendCommandMoveServer(newPos, true);
                 }
             }
@@ -227,7 +250,7 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
                 
 //                Logger.Log($"Mouse Pos: {end.X} {end.Y} Grid: {GridCoordinates.X} {GridCoordinates.Y}","PlayerEntity");
                 if (pathFinder != null)
-                    debugPathCoords = pathFinder.FindPath(start, end);
+                    debugPathCoords = pathFinder.FindPathImmediately(start, end);
             }
         }
     }
@@ -305,6 +328,9 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
 
     public void On_SceneLoad(FearProj.ServiceLocator.SceneManager.SceneType sceneType)
     {
+        if(!IsHost)
+            _disableNetworkObjects.DisableScriptsIfNotHost(false);
+        
         if (base.IsOwner)
         {
             if (sceneType == FearProj.ServiceLocator.SceneManager.SceneType.GameScene)
@@ -325,7 +351,7 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
         base.OnGhostEntityMovement_CollisionUpdate();
 
         var tickManager = ServiceLocator.Get<IServiceTickManager>();
-        if (base.IsOwner && tickManager.TickExecutionMode == TickManager.TickMode.Manual)
+        if (base.IsOwner)
         {
             var uiManager = ServiceLocator.Get<IServiceUIManager>();
 
@@ -335,8 +361,7 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
             //creature interaction choices
             foreach (var creatures in _objectsInRangeGhost)
             {
-                var collider = creatures.GetComponent<EntityCollider>();
-                var creature = collider.GetEntity();
+                var creature = creatures as ICreatureEntity;
                 uiManager.UIInteractionChoiceManager.SpawnInteractionChoice(this,
                     creature,
                     $"Interact {creature.EntityData.CreatureStats.Name}",
@@ -366,8 +391,7 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
             //creature interaction choices
             foreach (var creatures in _objectsInRangeCreature)
             {
-                var collider = creatures.GetComponent<EntityCollider>();
-                var creature = collider.GetEntity();
+                var creature = creatures as ICreatureEntity;
                 if (creature.CanInteract)
                 {
                     uiManager.UIInteractionChoiceManager.SpawnInteractionChoice(this,
@@ -376,6 +400,7 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
                         () => { Interaction_SpawnInteractionChoices(creature); });
                 }
             }
+            
         }
     }
 
@@ -562,6 +587,40 @@ public class PlayerEntity : CreatureEntity<PlayerEntityData>
             tickManager.TickExecutionMode = TickManager.TickMode.RealTime;
         else
             tickManager.TickExecutionMode = TickManager.TickMode.Manual;
+    }
+    
+    [ServerRpc]
+    public void RPCSwitchTickModeWaitForPlayerServer()
+    {
+        RPCSwitchTickModeWaitForPlayerClient();
+    }
+
+    [ObserversRpc]
+    void RPCSwitchTickModeWaitForPlayerClient()
+    {
+        var tickManager = ServiceLocator.Get<IServiceTickManager>();
+        var isForcePlayerActions = tickManager.TickModeRealTime == TickManager.TickModeRealTimeType.ForcePlayerAction;
+        if (isForcePlayerActions)
+            tickManager.TickModeRealTime = TickManager.TickModeRealTimeType.WaitForAllPlayers;
+        else
+            tickManager.TickModeRealTime = TickManager.TickModeRealTimeType.ForcePlayerAction;
+    }
+    
+    [ServerRpc]
+    public void RPCSwitchTickModeCommandExecutionModeServer()
+    {
+        RPCSwitchTickModeCommandExecutionModeClient();
+    }
+
+    [ObserversRpc]
+    void RPCSwitchTickModeCommandExecutionModeClient()
+    {
+        var tickManager = ServiceLocator.Get<IServiceTickManager>();
+        var isConcurrent = tickManager.CommandExecutionType == TickManager.CommandExecutionMode.Concurrently;
+        if (isConcurrent)
+            tickManager.CommandExecutionType = TickManager.CommandExecutionMode.Sequentially;
+        else
+            tickManager.CommandExecutionType = TickManager.CommandExecutionMode.Concurrently;
     }
 
     #endregion

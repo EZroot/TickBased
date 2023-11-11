@@ -56,5 +56,10 @@ namespace TickBased.Scripts.Commands
 
             _currentCreatureEntity.CreatureTransform.position = originalPosition;
         }
+
+        public void ExecuteImmediately()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

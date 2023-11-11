@@ -13,6 +13,8 @@ public class MenuGame : MonoBehaviour
     {
         var netwrk = ServiceLocator.Get<IServiceNetworkManager>();
         netwrk.FishnetManager.ClientManager.OnClientConnectionState += OnConnectedClient;
+        
+        //StartServer();
     }
     public void StartServer()
     {

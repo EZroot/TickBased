@@ -13,19 +13,24 @@ MonoBehaviour:
   m_Name: PlayerEntityData
   m_EditorClassIdentifier: 
   _playerEntityData:
+    UniqueID: 
     ID: dev_player
     IDHash: 
-    UniqueID: 
     IsPlayer: 1
+    IsDead: 0
     ClientStats:
       ClientId: 0
       Username: 
     CreatureStats:
       Name: Warforged
-      MovementSpeed: 30
+      Strength: 0
+      Faction:
+        FactionName: Faction Of Admins
+        FactionDescription: Admin Faction buddy
+        FactionType: 0
       CreatureLimbs:
       - LimbName: Head
-        Health: 100
+        Health: 89899
         Armour: 0
         IsAttached: 1
         LimbType: 0
@@ -89,6 +94,26 @@ MonoBehaviour:
         Armour: 0
         IsAttached: 1
         LimbType: 7
+      CreatureMoodle:
+        Moodle:
+          CurrentMood: 2
+          MoodDuration: 0
+          MoodImpact: 0
+      CreatureAbilityStats:
+      - CreatureStatType: 0
+        Level: 9
+      - CreatureStatType: 1
+        Level: 6
+      - CreatureStatType: 2
+        Level: 5
+      - CreatureStatType: 3
+        Level: 6
+      - CreatureStatType: 4
+        Level: 8
+      - CreatureStatType: 5
+        Level: 4
+      - CreatureStatType: 6
+        Level: 2
     CreatureSprites:
       SpriteAddressableKey: warforgedboss
       ArmourAddressableKey: 

@@ -16,5 +16,10 @@ namespace TickBased.Scripts.Commands
         {
             yield return null;
         }
+
+        public void ExecuteImmediately()
+        {
+            
+        }
     }
 }

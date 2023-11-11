@@ -7,6 +7,8 @@
         string UniqueID { get; }
         bool IsInitialized { get; }
         bool CanInteract { get; }
+        int EntityVision { get; }
+        bool IsDead { get; }
         CreatureEntityData EntityData { get; }
         CreatureInventory CreatureInventory { get; }
         ITileObject TileObject { get; }
@@ -16,5 +18,5 @@
         void SetStartPosition(GridManager.GridCoordinate coordinate, GridManager.TileState tileState);
         void HighlightCreature();
         void UnHighlightCreature();
-        
+        ICreatureEntity FindClosestEnemy(Transform creatureTransform, float detectionRadius);
     }

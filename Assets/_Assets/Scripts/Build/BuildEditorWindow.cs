@@ -70,7 +70,7 @@ public class BuildEditorWindow : EditorWindow
         buildPlayerOptions.options = developmentBuild ? BuildOptions.Development : BuildOptions.None;
 
         BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
-        CopyFiles(report);
+        //CopyFiles(report);
 
         BuildSummary summary = report.summary;
         

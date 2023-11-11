@@ -21,6 +21,7 @@ public class CreatureEntityData : EntityData
         TickBased.Logger.Logger.Log($"Setting sprites...", "CreatureEntityData");
         CreatureSprites = new CreatureSprites(sprites);
     }
+    
     public void SetClientStats(ClientStats stats)
     {
         TickBased.Logger.Logger.Log($"From CreatueEntData: {stats.ClientId} {stats.Username}");
@@ -59,7 +60,8 @@ public class CreatureEntityData : EntityData
             }
         }
     }
-
+    
+    [System.Serializable]
     public enum AttackType
     {
         Unarmed,
@@ -76,7 +78,7 @@ public class CreatureEntityData : EntityData
         Energy, 
         Explosive
     }
-    
+    [System.Serializable]
     public enum WrestleType
     {
         Grab,           // Grab a part of the opponent
@@ -125,9 +127,11 @@ public class CreatureSprites
 public class CreatureStats
 {
     public string Name;
-    public float MovementSpeed;
+    public int Strength;
+    public FactionData Faction;
     public CreatureLimbsData[] CreatureLimbs;
-    
+    public CreatureMoodleData CreatureMoodle;
+    public CreatureStatData[] CreatureAbilityStats;
     public CreatureStats()
     {
 
@@ -136,43 +140,82 @@ public class CreatureStats
     public CreatureStats(CreatureStats stats)
     {
         this.Name = stats.Name;
-        this.MovementSpeed = stats.MovementSpeed;
         this.CreatureLimbs = stats.CreatureLimbs;
+        this.CreatureMoodle = stats.CreatureMoodle;
+        this.CreatureAbilityStats = stats.CreatureAbilityStats;
     }
 
-    public CreatureStats(string name, float movementSpeed, CreatureLimbsData[] limbs)
+    
+    [System.Serializable]
+    public struct CreatureStatData
     {
-        this.Name = name;
-        this.MovementSpeed = movementSpeed;
-        this.CreatureLimbs = limbs;
-    }
+        public CreatureStatType CreatureStatType;
+        public int Level;
+        public double CurrentXP;
+        public double RequiredXP;
 
-    public CreatureLimbsData GetLimb(string limbName)
-    {
-        foreach (var limb in CreatureLimbs)
+        public void AddXp(double xpToAdd)
         {
-            if (limb.LimbName == limbName)
-                return limb;
+            
         }
-        return new CreatureLimbsData();
+
+        public void RemoveXP(double xpToRemove)
+        {
+            
+        }
+        
+        public void CalculateRequiredXp()
+        {
+            //do logic
+        }
+
+        void LevelUp()
+        {
+            
+        }
+
+        void LevelDown()
+        {
+            
+        }
+    }
+
+    [System.Serializable]
+    public enum CreatureStatType
+    {
+        Strength,
+        Perception,
+        Endurance,
+        Charisma,
+        Intelligence,
+        Agility,
+        Luck
+    }
+
+    [System.Serializable]
+    public struct CreatureMoodleData
+    {
+        public MoodleData Moodle;
+    }
+
+    [System.Serializable]
+    public struct MoodleData
+    {
+        public MoodleMoodType CurrentMood;
+        public float MoodDuration; //how long mood will last
+        public int MoodImpact; //effect of mood on creature?
+    }
+
+    [System.Serializable]
+    public enum MoodleMoodType
+    {
+        Depressed,
+        Sad,
+        Neutral,
+        Happy,
+        Gleeful
     }
     
-    public CreatureLimbsData[] GetLimbs(CreatureLimbType limbType)
-    {
-        List<CreatureLimbsData> tmp = new List<CreatureLimbsData>();
-        foreach (var limb in CreatureLimbs)
-        {
-            if (limb.LimbType == limbType)
-                tmp.Add(limb);
-        }
-        return tmp.ToArray();
-    }
-
-    public void SetMovementSpeed(float movementSpeed)
-    {
-        this.MovementSpeed = movementSpeed;
-    }
-
     [System.Serializable]
     public struct CreatureLimbsData
     {
@@ -183,6 +226,7 @@ public class CreatureStats
         public CreatureLimbType LimbType;
     }
     
+    [System.Serializable]
     public enum CreatureLimbType
     {
         Head,
@@ -194,7 +238,21 @@ public class CreatureStats
         Torso,
         Groin
     }
+    
+    [System.Serializable]
+    public struct FactionData
+    {
+        public string FactionName;
+        public string FactionDescription;
+        public FactionType FactionType;
+    }
 
+    [System.Serializable]
+    public enum FactionType
+    {
+        PlayerFaction,
+        AggressiveEnemyFaction
+    }
 }
 
 [System.Serializable]

@@ -6,5 +6,6 @@ namespace TickBased.Scripts.Commands
     {
         int Priority { get; }
         IEnumerator Execute();
+        void ExecuteImmediately();
     }
 }

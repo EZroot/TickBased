@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using FearProj.ServiceLocator;
 using GridCoordinate = FearProj.ServiceLocator.GridManager.GridCoordinate;
@@ -10,8 +12,9 @@ public class PathFinder
     private Dictionary<GridCoordinate, float> gCost = new Dictionary<GridCoordinate, float>();
     private Dictionary<GridCoordinate, float> fCost = new Dictionary<GridCoordinate, float>();
     private Dictionary<GridCoordinate, GridCoordinate> cameFrom = new Dictionary<GridCoordinate, GridCoordinate>();
+    public static HashSet<GridCoordinate> occupiedSquares = new HashSet<GridCoordinate>();
 
-    public List<GridCoordinate> FindPath(GridCoordinate start, GridCoordinate end)
+    public List<GridCoordinate> FindPathImmediately(GridCoordinate start, GridCoordinate end)
     {
         var gridManager = ServiceLocator.Get<IServiceGridManager>();
         var startTile = gridManager.GetTile(start.X, start.Y);
@@ -41,6 +44,7 @@ public class PathFinder
 
             if (current.Equals(end))
                 return ReconstructPath(current);
+                
 
             openSetHash.Remove(current);
             closedSet.Add(current);
@@ -66,7 +70,8 @@ public class PathFinder
                 }
             }
         }
-        return null; // Path not found
+
+        return null;
     }
 
     private List<GridCoordinate> ReconstructPath(GridCoordinate end)
@@ -110,7 +115,6 @@ public class PathFinder
     {
         return Mathf.Abs(a.X - b.X) + Mathf.Abs(a.Y - b.Y);
     }
-
     private IEnumerable<GridCoordinate> GetNeighbors(GridCoordinate current)
     {
         List<GridCoordinate> neighbors = new List<GridCoordinate>();
@@ -128,8 +132,9 @@ public class PathFinder
 
                 int newX = x + dx;
                 int newY = y + dy;
+                GridCoordinate newCoordinate = new GridCoordinate(newX, newY);
 
-                if (newX >= 0 && newX <= maxX && newY >= 0 && newY <= maxY)
+                if (newX >= 0 && newX <= maxX && newY >= 0 && newY <= maxY && !occupiedSquares.Contains(newCoordinate))
                 {
                     GridManager.Tile neighborTile = gridManager.GetTile(newX, newY);
                     if (neighborTile.State != GridManager.TileState.Obstacle)

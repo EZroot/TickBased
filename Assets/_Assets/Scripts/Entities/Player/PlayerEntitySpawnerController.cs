@@ -84,7 +84,7 @@ public class PlayerEntitySpawnerController : NetworkBehaviour
     }
     public void SpawnAggressive()
     {
-        for (var i = 0; i < 1; i++)
+        for (var i = 0; i < 6; i++)
         {
             var p = ServiceLocator.Get<IServiceCreatureManager>();
             var playerPos = p.Player.GridCoordinates;
@@ -94,9 +94,9 @@ public class PlayerEntitySpawnerController : NetworkBehaviour
     }
     public void SpawnDebugZombie()
     {
-        for (var i = -1; i < 1; i++)
+        for (var i = -3; i < 3; i++)
         {
-            for (var j = -1; j < 0; j++)
+            for (var j = -3; j < 3; j++)
             {
                 var p = ServiceLocator.Get<IServiceCreatureManager>();
                 var playerPos = p.Player.GridCoordinates;
@@ -144,14 +144,14 @@ public class PlayerEntitySpawnerController : NetworkBehaviour
     }
     public void SpawnDebugZombie2()
     {
-        for (var i = -1; i < 1; i++)
+        for (var i = -3; i < 3; i++)
         {
-            for (var j = -1; j < 0; j++)
+            for (var j = -3; j < 3; j++)
             {
                 var p = ServiceLocator.Get<IServiceCreatureManager>();
                 var playerPos = p.Player.GridCoordinates;
                 RPCLoadEntityServer(EntityType.AggressiveEntity,
-                    new GridManager.GridCoordinate(playerPos.X + 10 + j, playerPos.Y + 6 +i), "dev_aggressive_zombie_old");
+                    new GridManager.GridCoordinate(playerPos.X + 8 + j, playerPos.Y + 8 +i), "dev_aggressive_zombie_old");
             }
         }
     }

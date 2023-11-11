@@ -16,7 +16,7 @@ namespace FearProj.ServiceLocator
 
         [SerializeField] private Color _backGroundColor = Color.black;
         [SerializeField] private GameObject _chunkPrefab;
-
+        [SerializeField] private bool _debugHideLights = false;
         private List<GridChunkMesh> _lightGridChunks;
         private int _gridWidth;
         private int _gridHeight;
@@ -26,6 +26,12 @@ namespace FearProj.ServiceLocator
 
         private Dictionary<string, LightSource> _lights = new Dictionary<string, LightSource>();
 
+        private void OnGUI()
+        {
+            GUI.Box(new Rect(0,175,205,50), "LightManager");
+            GUI.Label(new Rect(10, 205, 200, 20), $"Lights: {_lights.Count}");
+        }
+        
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.M))
@@ -59,12 +65,12 @@ namespace FearProj.ServiceLocator
                 }
             }
 
-            transform.position = new Vector3(-tileSize / 2, -tileSize / 2, -1f);
+            transform.position = new Vector3(-tileSize / 2, -tileSize / 2, _debugHideLights ? 2f : -1f);
 
             CreateLightChunks(tileSize);  // Create chunks
             
             var tickManager = ServiceLocator.Get<IServiceTickManager>();
-            tickManager.OnCommandExecuted += UpdateChunkVisibility;
+            tickManager.PostTick += UpdateChunkVisibility;
             
             stopwatch.Stop();
             long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;

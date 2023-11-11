@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FearProj.ServiceLocator;
 using FishNet.Object;
 using TickBased.Scripts.Commands;
@@ -21,11 +22,13 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
     public Action OnDeath;
     public Action OnGhostEntityMovement;
     public virtual bool CanInteract => _canInteract;
+    public int EntityVision => _entityVision;
     public CreatureEntityData EntityData => _entityData;
     public CreatureInventory CreatureInventory => _creatureInventory;
     public ITileObject TileObject => this;
     public string UniqueID => EntityData.UniqueID;
     public bool IsInitialized => EntityData != null || EntityData.UniqueID != String.Empty;
+    public bool IsDead => _entityData.IsDead;
 
     public Transform Transform => transform;
     public Transform CreatureTransform => _creatureTransform;
@@ -33,23 +36,23 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
     
     //Current location for updating movement commands
     [Header("- DEBUG - dont change this")]
-    [SerializeField] private GridManager.GridCoordinate _ghostGridPosition;
-    [SerializeField]protected GameObject[] _objectsInRangeCreature;
-    [SerializeField]protected GameObject[] _objectsInRangeGhost;
+    [SerializeField]protected GridManager.GridCoordinate _ghostGridPosition;
+    [SerializeField]protected List<ITileObject> _objectsInRangeCreature;
+    [SerializeField]protected List<ITileObject> _objectsInRangeGhost;
 
     public virtual void Start()
     {
         TickBased.Logger.Logger.Log("Start called", "CreatureEntity");
         _creatureInventory = new CreatureInventory();
         var tickManager = ServiceLocator.Get<IServiceTickManager>();
-            tickManager.OnCommandExecuted += OnSavedData_CheckIfDead;
+            tickManager.PostTick += OnSavedData_CheckIfDead;
         //will probably need to sync this initial position or something
         SetGridCoordinates((int)_creatureTransform.transform.position.x, (int) _creatureTransform.transform.position.y, _occupiedTileState);
         _creatureTransform.transform.localPosition = transform.position;
         _ghostGridPosition = new GridManager.GridCoordinate(GridCoordinates.X,GridCoordinates.Y);
         AddCreatureToManager();
     }
-
+    
     void OnSavedData_CheckIfDead()
     {
         TickBased.Logger.Logger.Log("Checking if dead", "Dead");
@@ -92,7 +95,64 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
         creatureManager.AddCreature(this);
     }
     
+    public ICreatureEntity FindClosestEnemy(Transform creatureTransform, float detectionRadius)
+    {
+        float closestSqrDistance = detectionRadius * detectionRadius; // Use squared radius to compare squared distances
+        ICreatureEntity closestEnemy = null;
+        Vector2 creaturePos = creatureTransform.position;
 
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(creaturePos, detectionRadius);
+
+        foreach (Collider2D hitCollider in hitColliders)
+        {
+            var enemyCollider = hitCollider.GetComponent<EntityCollider>();
+            var enemy = enemyCollider.GetEntity();
+            if(enemy is IBuildableObject or IInventoryItem)
+                continue;
+            if (enemy == null || enemy.UniqueID == UniqueID || enemy.EntityData.ID == EntityData.ID || enemy.IsDead)
+                continue;
+
+            //optimized version
+            float sqrDistance = (creaturePos - (Vector2)enemy.CreatureTransform.position).sqrMagnitude;
+
+            if (sqrDistance < closestSqrDistance)
+            {
+                closestSqrDistance = sqrDistance;
+                closestEnemy = enemy;
+            }
+        }
+
+        return closestEnemy;
+    }
+
+    
+    // public ICreatureEntity FindClosestEnemy(Transform creatureTransform, float detectionRadius)
+    // {
+    //     float closestDistance = Mathf.Infinity;
+    //     ICreatureEntity closestEnemy = null;
+    //
+    //     Collider2D[] hitColliders = Physics2D.OverlapCircleAll(creatureTransform.position, detectionRadius);
+    //
+    //     foreach (Collider2D hitCollider in hitColliders)
+    //     {
+    //         var enemyCollider = hitCollider.GetComponent<EntityCollider>();
+    //         var enemy = enemyCollider.GetEntity();
+    //         if(enemy is IBuildableObject or IInventoryItem)
+    //             continue;
+    //         if (enemy == null || enemy.UniqueID == UniqueID || enemy.EntityData.ID == EntityData.ID || enemy.IsDead) //dont want to get us, or get the same data entity as us
+    //             continue;
+    //
+    //         float distance = Vector2.Distance(creatureTransform.position, enemy.CreatureTransform.position);
+    //
+    //         if (distance < closestDistance)
+    //         {
+    //             closestDistance = distance;
+    //             closestEnemy = enemy;
+    //         }
+    //     }
+    //
+    //     return closestEnemy;
+    // }
 
     public void SetDirection(Quaternion rotation)
     {
@@ -151,17 +211,21 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
             // New code for the ghost character
             var gx = (int)(newPosition.X);
             var gy = (int)(newPosition.Y);
+            PathFinder.occupiedSquares.Remove(_ghostGridPosition);
             _ghostGridPosition = new GridManager.GridCoordinate(gx,gy);
+            PathFinder.occupiedSquares.Add(_ghostGridPosition);
+
             var ghostPos = worldPosition;
             UpdateGhostPosition(ghostPos);
         }
     }
     
-    void UpdateGhostPosition(GridManager.GridCoordinate newPosition)
+    protected void UpdateGhostPosition(GridManager.GridCoordinate newPosition)
     {
         // Update the transform or the position of the ghost character based on the new grid position
         _ghostTransform.position = new Vector2(newPosition.X,newPosition.Y);
         OnGhostEntityMovement?.Invoke();
+        OnGhostEntityMovement_CollisionUpdate();
     }
     
     protected void BuildObject(string targetCreatureUniqueID, int amountOfWorkToAdd)
@@ -240,35 +304,62 @@ public class CreatureEntity<T> : Entity<T>, ICreatureEntity where T : CreatureEn
     
     protected virtual void OnCommandExecuted_CollisionUpdate()
     {
-        // Define the position and radius
-        Vector2 position = CreatureTransform.position;
+        var position = _gridCoordinates;
 
         // Perform the OverlapCircleAll
-        Collider2D[] hits = Physics2D.OverlapCircleAll(position, _collisionRadius);
-        _objectsInRangeCreature = new GameObject[hits.Length];
-        // Process the hits
-        for (int i = 0; i < hits.Length; i++)
+
+        _objectsInRangeCreature = new List<ITileObject>();
+        
+        var gridManager = ServiceLocator.Get<IServiceGridManager>();
+        for (int dx = position.X-1; dx <= position.X+1; dx++)
         {
-            // Do something with each object that was hit
-            TickBased.Logger.Logger.Log("Hit: " + hits[i].gameObject.name, "PlayerEntity:OnTick_Collision");
-            _objectsInRangeCreature[i] = hits[i].gameObject;
+            for (int dy = position.Y-1; dy <= position.Y+1; dy++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int newX = position.X + dx;
+                int newY = position.Y + dy;
+
+                if (newX >= 0 && newX <= gridManager.Grid.Width && newY >= 0 && newY <= gridManager.Grid.Height)
+                {
+                    GridManager.Tile neighborTile = gridManager.GetTile(newX, newY);
+                    if (neighborTile.State == GridManager.TileState.Obstacle)
+                    {
+                        _objectsInRangeCreature.Add(neighborTile.ObjectOnTile);
+                    }
+                }
+            }
         }
     }
     
     protected virtual void OnGhostEntityMovement_CollisionUpdate()
     {
         // Define the position and radius
-        Vector2 position = GhostTransform.position;
+        var position = _ghostGridPosition;
 
         // Perform the OverlapCircleAll
-        Collider2D[] hits = Physics2D.OverlapCircleAll(position, _collisionRadius);
-        _objectsInRangeGhost = new GameObject[hits.Length];
-        // Process the hits
-        for (int i = 0; i < hits.Length; i++)
+
+        _objectsInRangeGhost = new List<ITileObject>();
+        
+        var gridManager = ServiceLocator.Get<IServiceGridManager>();
+        for (int dx = -1; dx <= 1; dx++)
         {
-            // Do something with each object that was hit
-            TickBased.Logger.Logger.Log("Hit: " + hits[i].gameObject.name, "PlayerEntity:OnTick_Collision");
-            _objectsInRangeGhost[i] = hits[i].gameObject;
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int newX = position.X + dx;
+                int newY = position.Y + dy;
+
+                if (newX >= 0 && newX <= gridManager.Grid.Width && newY >= 0 && newY <= gridManager.Grid.Height)
+                {
+                    GridManager.Tile neighborTile = gridManager.GetTile(newX, newY);
+                    if (neighborTile.State == GridManager.TileState.Obstacle)
+                    {
+                        _objectsInRangeGhost.Add(neighborTile.ObjectOnTile);
+                    }
+                }
+            }
         }
     }
 

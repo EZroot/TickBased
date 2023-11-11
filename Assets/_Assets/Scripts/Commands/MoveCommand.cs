@@ -38,19 +38,35 @@ namespace TickBased.Scripts.Commands
 
             _creatureEntity.CreatureTransform.position = targ;
             
-            var gridManager = ServiceLocator.Get<IServiceGridManager>();
             
-            var lightManager = ServiceLocator.Get<IServiceLightManager>();
 
             //lightManager.ResetAccumulator();
+            var gridManager = ServiceLocator.Get<IServiceGridManager>();
+
             var x = (int)(targ.x / gridManager.TileSize);
             var y = (int)(targ.y / gridManager.TileSize);
-            
+            var lightManager = ServiceLocator.Get<IServiceLightManager>();
             lightManager.UpdateLightSourcePosition(_creatureEntity.UniqueID, x,y);
             
             //lightManager.AddRadialLight($"derp_{x}", x+8,y, 4, new Color(0f,0f,0f,0f));
             //lightManager.ApplyAccumulatedLight();
             //lightManager.SetTileLight(x, y, 0f);
+        }
+
+        public void ExecuteImmediately()
+        {
+            if (_creatureEntity.EntityData.IsDead)
+                return;
+            var targ = new Vector2(targetPosition.X, targetPosition.Y);
+
+            _creatureEntity.CreatureTransform.position = targ;
+            var gridManager = ServiceLocator.Get<IServiceGridManager>();
+
+            var x = (int)(targ.x / gridManager.TileSize);
+            var y = (int)(targ.y / gridManager.TileSize);
+            var lightManager = ServiceLocator.Get<IServiceLightManager>();
+            lightManager.UpdateLightSourcePosition(_creatureEntity.UniqueID, x,y);
+
         }
     }
 }

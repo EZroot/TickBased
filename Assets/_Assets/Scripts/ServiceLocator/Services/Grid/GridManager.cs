@@ -27,11 +27,12 @@ namespace FearProj.ServiceLocator
         [SerializeField] private GameObject _mouseGridOutlinePrefab;
         [SerializeField] private Texture2D _gameTextureMap;
         [SerializeField] private bool _colorVerticesOnGenerate = true;
+        [SerializeField] private int _gridSeed = -1;
+
         [Header("- Grid Settings - Must be divisible by 4")] [SerializeField]
         private int _gridSize = 64; //divisible by 4
 
         [SerializeField] private int _tileSize = 2;
-        [SerializeField] private int _seed = 6969;
 
         [Header("- Generation Settings -")] [Range(0f, 1f)] [SerializeField]
         private float _perlinNoiseLayer1Scale = 0.1f;
@@ -39,7 +40,6 @@ namespace FearProj.ServiceLocator
         [Range(0f, 1f)] [SerializeField] private float _perlinNoiseLayer2Scale = 0.5f;
         [Range(0f, 2f)] [SerializeField] private float _distanceFromEdgeToGenerate = 1f;
 
-        private int _gridSeed = -1;
         private MouseGridOutline _mouseGridOutline;
         private List<GridChunkMesh> _gridChunks;
         private GridData _gridData;
@@ -60,6 +60,15 @@ namespace FearProj.ServiceLocator
 
         public event Action OnPreGridGeneration;
         public event Action OnPostGridGeneration;
+        
+        private void OnGUI()
+        {
+            GUI.Box(new Rect(0,225,205,140), "GridManager");
+            GUI.Label(new Rect(10, 245, 200, 20), $"Seed: {GridSeed}");
+            GUI.Label(new Rect(10, 275, 200, 20), $"Size: {GridSize}");
+            GUI.Label(new Rect(10, 305, 200, 20), $"TileSize: {GridTileSize}");
+            GUI.Label(new Rect(10, 335, 200, 20), $"Grid: [{Grid.Height},{Grid.Width}]");
+        }
         
         void Update()
         {
@@ -174,7 +183,7 @@ namespace FearProj.ServiceLocator
             lightManager.GenerateLightMesh(grid);
 
             var tickManager = ServiceLocator.Get<IServiceTickManager>();
-            tickManager.OnCommandExecuted += UpdateChunkVisibility;
+            tickManager.PostTick += UpdateChunkVisibility;
             
             
             //Pathfinding
@@ -633,8 +642,23 @@ namespace FearProj.ServiceLocator
                 ObjectOnTile = objectOnTile;
             }
         }
-        
-        
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.yellow;
+            for (var i = 0; i < _gridData.Width; i++)
+            {
+                for (var j = 0; j < _gridData.Height; j++)
+                {
+                    var tile = GetTile(i, j);
+                    if (tile.State != TileState.Empty)
+                    {
+                        Gizmos.DrawSphere(GridToWorld(i,j), 0.5f);
+                    }
+                }
+            }
+        }
+
         // void OnDrawGizmos()
         // {
         //     var gridWidth = _gridData.Width;

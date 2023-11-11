@@ -15,8 +15,16 @@ public class PlayerTickController : NetworkBehaviour
     private Dictionary<string, bool> _playersCommandStatus = new Dictionary<string, bool>(); // Key is playerID, value is whether they've issued a command this tick
 
     private float _lastCommandCheckTime = 0;
-    [SerializeField] private float _timeLimitForCommand = 1.0f; // 1 second to issue a command
+    [SerializeField] private float _timeLimitBeforForcedWaitCommand = 1.0f; // 1 second to issue a command
     private bool _isInitialized = false;
+
+    private PlayerEntity _playerEntity;
+
+    void Start()
+    {
+        _playerEntity = GetComponent<PlayerEntity>();
+    }
+    
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -38,7 +46,7 @@ public class PlayerTickController : NetworkBehaviour
 
         //Sends commands from every player, forced by server / host
         _lastCommandCheckTime += Time.deltaTime;
-        if (_lastCommandCheckTime >= _timeLimitForCommand)
+        if (_lastCommandCheckTime >= _timeLimitBeforForcedWaitCommand)
         {
             var tickManager = ServiceLocator.Get<IServiceTickManager>();
             if (tickManager.TickModeRealTime == TickManager.TickModeRealTimeType.ForcePlayerAction && tickManager.IsExecutingTick == false)
@@ -65,7 +73,7 @@ public class PlayerTickController : NetworkBehaviour
         var creatureManager = ServiceLocator.Get<IServiceCreatureManager>();
 
         //if its manually, well handle it through ending turns? since this will auto trigger when everyone has sent 1 command
-        if (tickManager.TickExecutionMode == TickManager.TickMode.Manual)
+        if (tickManager.TickExecutionMode == TickManager.TickMode.Manual || tickManager.IsExecutingTick)
             return;
 
         //initialize our player list if a new player has joined
